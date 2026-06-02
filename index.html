@@ -55,63 +55,67 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .topbar{
   display:flex;
   align-items:center;
-  justify-content:space-between;
   padding:13px 26px;
   border-bottom:1px solid var(--border);
   background:var(--surface);
   flex-shrink:0;
   flex-wrap:nowrap;
-  gap:12px;
+  gap:16px;
 }
 .topbar-left{display:flex;align-items:center;gap:12px;flex-shrink:0;}
-.topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:auto;}
-.topbar-prices{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.topbar-prices{display:flex;align-items:center;gap:12px;flex-shrink:0;margin-left:auto;}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
 
 /* ── MOBILE — stack into two rows ── */
 @media(max-width:768px){
   .topbar{
     flex-wrap:wrap;
     padding:10px 14px;
-    gap:8px;
+    gap:0;
     align-items:center;
+    row-gap:8px;
   }
-  /* Row 1: Logo left | Wallet right — each pinned to their side */
+  /* Row 1 left: Logo */
   .topbar-left{
     flex:1;
     min-width:0;
     order:1;
+    gap:8px;
   }
+  /* Row 1 right: Wallet button */
   .topbar-right{
     order:2;
     margin-left:0;
     flex-shrink:0;
   }
-  /* Row 2: Prices full-width below */
+  /* Row 2: Prices — forced to own line */
   .topbar-prices{
     order:3;
     width:100%;
+    margin-left:0;
     flex-wrap:wrap;
     gap:6px;
-    padding-top:2px;
-  }
-  /* Compact stat pills for mobile */
-  .stat-pill{
-    flex-direction:row !important;
     align-items:center;
-    gap:3px;
-    padding:3px 8px !important;
+  }
+  /* Pills: horizontal label + value side by side */
+  .stat-pill{
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    gap:4px;
+    padding:4px 10px;
     background:var(--surface2);
     border-radius:20px;
     border:1px solid var(--border);
   }
   .stat-pill .sl{
-    font-size:7.5px !important;
-    letter-spacing:.03em;
-    text-transform:uppercase;
+    font-size:9px;
     color:var(--text3);
+    letter-spacing:.04em;
+    text-transform:uppercase;
   }
   .stat-pill .sv{
-    font-size:11px !important;
+    font-size:12px;
     font-weight:700;
     color:var(--text);
   }
@@ -158,10 +162,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .page-label{font-family:var(--font-d);font-weight:800;font-size:16px;letter-spacing:-.02em;background:linear-gradient(90deg,#fff 0%,#38bdf8 40%,#fff 60%,#0ea5e9 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glow-sweep 3s linear infinite;filter:drop-shadow(0 0 8px rgba(14,165,233,.5));}
 @keyframes glow-sweep{0%{background-position:0% center}100%{background-position:200% center}}
 .page-sublabel{font-size:11.5px;color:var(--text2);}
-/* stat-pill — desktop: column layout */
-.stat-pill{display:flex;flex-direction:column;align-items:flex-end;}
-.stat-pill .sl{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;}
-.stat-pill .sv{font-size:13.5px;font-weight:700;color:var(--text);}
+/* stat-pill — desktop: stacked label above value */
+.stat-pill{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;}
+.stat-pill .sl{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;display:block;}
+.stat-pill .sv{font-size:13.5px;font-weight:700;color:var(--text);display:block;}
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green);animation:pulse 2s infinite;flex-shrink:0;}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
 @keyframes priceFlashUp{0%{background:rgba(16,217,122,.25);}100%{background:transparent;}}
