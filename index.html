@@ -113,57 +113,75 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 /* ── MOBILE ≤768px ── */
 @media(max-width:768px){
+  /* 2-column grid: logo left, wallet+prices right — no overlap */
   .topbar{
-    flex-wrap:wrap;
-    padding:10px 14px;
-    gap:8px;
+    display:grid;
+    grid-template-columns:1fr auto;
+    align-items:start;
+    padding:12px 14px;
+    gap:10px;
     row-gap:0;
   }
   .topbar-left{
-    flex:1;
-    min-width:0;
-    gap:8px;
+    grid-column:1;
+    grid-row:1;
+    align-self:start;
+    gap:2px;
+    flex-direction:column;
+    align-items:flex-start;
   }
-  /* Right side becomes a column: wallet on top, prices below */
+  .topbar-left .live-dot{
+    /* keep dot inline with title */
+    margin-top:4px;
+    align-self:flex-start;
+  }
+  /* Right column: wallet on top, prices below — both right-aligned */
   .topbar-right{
+    grid-column:2;
+    grid-row:1;
     flex-direction:column;
     align-items:flex-end;
     gap:0;
     margin-left:0;
   }
-  /* Wallet first on mobile */
-  #walletFab{ order:1; margin-bottom:8px; }
-  /* Prices row under wallet with clear separation */
+  #walletFab{
+    order:1;
+    margin-bottom:10px; /* clear separation from prices */
+    white-space:nowrap;
+  }
   .topbar-prices{
     order:2;
     flex-direction:row;
     flex-wrap:wrap;
     justify-content:flex-end;
-    gap:6px;
+    gap:5px;
   }
-  /* Pills compact horizontal */
+  /* Pills: compact horizontal */
   .stat-pill{
     flex-direction:row;
     align-items:center;
-    gap:3px;
-    padding:3px 8px;
+    gap:4px;
+    padding:4px 9px;
     background:var(--surface2);
     border-radius:20px;
     border:1px solid var(--border);
   }
   .stat-pill .sl{
     font-size:8px;
-    letter-spacing:.03em;
+    letter-spacing:.04em;
+    color:var(--text3);
+    text-transform:uppercase;
   }
   .stat-pill .sv{
-    font-size:11px;
+    font-size:11.5px;
     font-weight:700;
     color:var(--text);
   }
   .stat-pill .sv span{display:none;}
   .stat-pill .sv .price-val{display:inline;}
+  /* Title area */
   .page-label{font-size:13px;}
-  .page-sublabel{font-size:10px;}
+  .page-sublabel{font-size:10px;margin-top:2px;}
   .live-dot{width:6px;height:6px;}
   #clk{display:none;}
   /* Layout */
