@@ -37,7 +37,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--surface4);border-radius:4px;}
 
-.app{display:flex;height:100vh;}
+.app{display:flex;height:100vh;height:100dvh;}
 .sidebar{width:72px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;position:relative;z-index:10;}
 .sidebar::after{content:'';position:absolute;top:0;right:-1px;width:1px;height:100%;background:linear-gradient(to bottom,transparent,rgba(14,165,233,.25),transparent);}
 .main-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
@@ -111,66 +111,110 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   line-height:1.2;
 }
 
-/* ── MOBILE ≤768px ── */
+/* ══════════════════════════════════════
+   MOBILE — bottom nav bar pattern
+   Sidebar moves to bottom; topbar slims
+══════════════════════════════════════ */
 @media(max-width:768px){
-  .topbar{
-    display:flex;
+
+  /* ── App shell ── */
+  .app{
     flex-direction:column;
-    padding:10px 14px;
-    gap:0;
+    height:100dvh; /* dynamic viewport height avoids browser chrome overlap */
   }
 
-  /* Row 1: Logo left only */
-  .topbar-left{
+  /* ── Sidebar → bottom nav bar ── */
+  .sidebar{
     width:100%;
-    gap:8px;
-    margin-bottom:10px;
+    height:56px;
+    flex-direction:row;
+    justify-content:space-around;
+    align-items:center;
+    border-right:none;
+    border-top:1px solid var(--border);
+    order:3; /* push below content */
+    flex-shrink:0;
+    padding:0 4px;
+  }
+  .sidebar::after{ display:none; }
+  .logo{ display:none; } /* hide logo icon in bottom bar */
+
+  .nav{
+    flex-direction:row;
+    padding:0;
+    gap:0;
+    width:100%;
+    justify-content:space-around;
+  }
+  .nav-item{
+    width:auto;
+    flex:1;
+    padding:6px 2px;
+    gap:3px;
+  }
+  .nav-item span{ font-size:8px; }
+  .nav-icon{ width:26px; height:26px; }
+
+  /* ── Main wrap ── */
+  .main-wrap{
+    flex:1;
+    min-height:0;
+    overflow:hidden;
+    order:2;
   }
 
-  /* Row 2: [BTC ETH SOL GAS] [Connect Wallet] — single nowrap line */
+  /* ── Topbar: single compact row ── */
+  .topbar{
+    flex-direction:row;
+    align-items:center;
+    padding:8px 12px;
+    gap:8px;
+    flex-wrap:nowrap;
+    flex-shrink:0;
+  }
+  .topbar-left{
+    gap:7px;
+    flex-shrink:0;
+  }
   .topbar-right{
     display:flex;
     flex-direction:row;
     align-items:center;
-    gap:8px;
-    margin-left:0;
+    gap:6px;
+    margin-left:auto;
     flex-wrap:nowrap;
-    width:100%;
     overflow-x:auto;
     overflow-y:hidden;
     scrollbar-width:none;
     -ms-overflow-style:none;
-    padding-bottom:4px;
+    max-width:calc(100vw - 180px);
+    padding-bottom:2px;
   }
   .topbar-right::-webkit-scrollbar{ display:none; }
 
-  /* Prices row: inline, no wrap, shrink to fit */
   .topbar-prices{
     display:flex;
     flex-direction:row;
     flex-wrap:nowrap;
     align-items:center;
-    gap:6px;
+    gap:5px;
     order:1;
     flex-shrink:0;
   }
-
-  /* Wallet: after prices, pinned right */
   #walletFab{
     order:2;
-    margin-left:auto;
     flex-shrink:0;
     white-space:nowrap;
-    padding:6px 12px;
-    font-size:11px;
+    padding:5px 10px;
+    font-size:10.5px;
   }
 
-  /* Pills: compact, single line */
+  /* Compact price pills */
   .stat-pill{
     flex-direction:row;
     align-items:center;
     gap:3px;
-    padding:4px 8px;
+    padding:3px 7px;
     background:var(--surface2);
     border-radius:20px;
     border:1px solid var(--border);
@@ -178,13 +222,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     white-space:nowrap;
   }
   .stat-pill .sl{
-    font-size:8px;
+    font-size:7.5px;
     letter-spacing:.03em;
     color:var(--text3);
     text-transform:uppercase;
   }
   .stat-pill .sv{
-    font-size:11.5px;
+    font-size:11px;
     font-weight:700;
     color:var(--text);
   }
@@ -192,42 +236,120 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   .stat-pill .sv .price-val{ display:inline; }
 
   .page-label{ font-size:13px; }
-  .page-sublabel{ font-size:10px; margin-top:2px; }
+  .page-sublabel{ display:none; }
   .live-dot{ width:6px; height:6px; }
   #clk{ display:none; }
+
+  /* ── Left panel hidden on mobile ── */
   .left-panel{ display:none; }
-  .bot-layout{ grid-template-columns:1fr; }
-  .cgrid{ grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
-  .pipeline{ grid-template-columns:1fr 1fr; }
-  .collab-stats{ grid-template-columns:1fr 1fr; }
-  .collab-form-grid{ grid-template-columns:1fr 1fr; }
-  .radar-grid{ grid-template-columns:1fr; }
+
+  /* ── Content area fills remaining height ── */
+  .content-area{
+    flex:1;
+    min-height:0;
+    overflow:hidden;
+  }
+  .right-panel{
+    flex:1;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  /* ── Pages ── */
   .page{ padding:14px 12px; }
   .page-title{ font-size:20px; }
   .page-desc{ font-size:11.5px; }
+
+  /* ── Cards / grids ── */
+  .cgrid{ grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
+  .bot-layout{ grid-template-columns:1fr; }
+  .pipeline{ grid-template-columns:1fr 1fr; overflow-x:auto; }
+  .collab-stats{ grid-template-columns:1fr 1fr; }
+  .collab-form-grid{ grid-template-columns:1fr 1fr; }
+  .radar-grid{ grid-template-columns:1fr; }
+
+  /* ── Burner stats grid ── */
+  #burnerStats{ grid-template-columns:1fr 1fr !important; }
+
+  /* ── Mint Direct config fields ── */
+  #mdConfigFields{ grid-template-columns:1fr 1fr !important; }
+
+  /* ── Radar stats row ── */
+  .radar-grid > div:last-child > div:first-child + div{
+    grid-template-columns:1fr 1fr;
+  }
+
+  /* ── FAB (theme toggle) sits above bottom nav ── */
+  #fabContainer{
+    bottom:66px;
+    right:12px;
+  }
+
+  /* ── Modal full-width on mobile ── */
+  .modal{
+    width:96%;
+    padding:20px 16px;
+    border-radius:12px;
+    max-height:90dvh;
+    overflow-y:auto;
+  }
+  .cdm-inner{
+    width:96%;
+    padding:20px 16px;
+    max-height:90dvh;
+  }
+
+  /* ── Onboarding modal full screen ── */
+  #onboardModal .modal{
+    padding:20px 16px;
+    width:100%;
+    max-width:100%;
+    border-radius:0;
+    min-height:100dvh;
+    overflow-y:auto;
+    max-height:none;
+  }
+
+  /* ── Task meta grid compress ── */
+  .task-meta{ grid-template-columns:repeat(2,1fr) !important; }
+
+  /* ── Page header flex on collab ── */
+  #pg-collabs .page-header{ flex-direction:column; gap:10px; }
+  #pg-collabs .page-header > div:last-child{ width:100%; justify-content:flex-start; }
+
+  /* ── Radar page header ── */
+  #pg-radar .page-header{ flex-direction:column; gap:10px; }
+  #pg-radar .page-header > div:last-child{ width:100%; }
+
+  /* ── Bot task section ── */
+  #botTaskSection{ gap:14px; }
+
+  /* ── Mint direct meta cards ── */
+  #mdMeta{ grid-template-columns:1fr 1fr !important; }
 }
 
 /* ── SMALL PHONES ≤480px ── */
 @media(max-width:480px){
-  .topbar{padding:8px 10px;gap:6px;}
-  .page-label{font-size:12px;letter-spacing:0;}
-  .page-sublabel{display:none;}
-  #solPill{display:none;}
-  #gasPill{display:none;}
-  #walletFab{padding:5px 11px;font-size:10.5px;}
-  .sidebar{width:50px;}
-  .nav-item{width:42px;padding:8px 2px;}
-  .nav-item span{font-size:7.5px;}
-  .nav-icon{width:24px;height:24px;}
-  .logo-icon{width:30px;height:30px;font-size:15px;}
-  .page{padding:10px 8px;}
-  .page-title{font-size:18px;}
-  .cgrid{grid-template-columns:1fr 1fr;}
-  .pipeline{grid-template-columns:1fr;}
-  .collab-stats{grid-template-columns:1fr 1fr;}
-  .collab-form-grid{grid-template-columns:1fr;}
-  #fabContainer{bottom:14px;right:14px;}
-  #onboardModal .modal{padding:20px 16px;width:100%;max-width:100%;border-radius:0;min-height:100vh;overflow-y:auto;}
+  .page-label{ font-size:12px; letter-spacing:0; }
+  #solPill{ display:none; }
+  #gasPill{ display:none; }
+  #walletFab{ padding:4px 9px; font-size:10px; }
+  .nav-item span{ font-size:7px; }
+  .nav-icon{ width:22px; height:22px; }
+  .page{ padding:10px 10px; }
+  .page-title{ font-size:17px; }
+  .cgrid{ grid-template-columns:1fr 1fr; }
+  .pipeline{ grid-template-columns:1fr; }
+  .collab-stats{ grid-template-columns:1fr 1fr; }
+  .collab-form-grid{ grid-template-columns:1fr; }
+  #burnerStats{ grid-template-columns:1fr 1fr !important; }
+  #mdMeta{ grid-template-columns:1fr 1fr !important; }
+  #mdConfigFields{ grid-template-columns:1fr 1fr !important; }
+  .task-meta{ grid-template-columns:1fr 1fr !important; }
+  .lf-2col{ grid-template-columns:1fr; }
+  /* TX modal rows stack on tiny screens */
+  .tx-row{ flex-direction:column; gap:2px; }
+  .tx-v{ text-align:left; }
 }
 .page-label{font-family:var(--font-d);font-weight:800;font-size:16px;letter-spacing:-.02em;background:linear-gradient(90deg,#fff 0%,#38bdf8 40%,#fff 60%,#0ea5e9 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glow-sweep 3s linear infinite;filter:drop-shadow(0 0 8px rgba(14,165,233,.5));}
 @keyframes glow-sweep{0%{background-position:0% center}100%{background-position:200% center}}
