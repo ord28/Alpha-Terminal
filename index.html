@@ -113,57 +113,64 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 /* ── MOBILE ≤768px ── */
 @media(max-width:768px){
-  /* 2-column grid: logo left, wallet+prices right — no overlap */
   .topbar{
-    display:grid;
-    grid-template-columns:1fr auto;
-    align-items:start;
-    padding:12px 14px;
-    gap:10px;
-    row-gap:0;
-  }
-  .topbar-left{
-    grid-column:1;
-    grid-row:1;
-    align-self:start;
-    gap:2px;
+    display:flex;
     flex-direction:column;
-    align-items:flex-start;
-  }
-  .topbar-left .live-dot{
-    /* keep dot inline with title */
-    margin-top:4px;
-    align-self:flex-start;
-  }
-  /* Right column: wallet on top, prices below — both right-aligned */
-  .topbar-right{
-    grid-column:2;
-    grid-row:1;
-    flex-direction:column;
-    align-items:flex-end;
+    padding:10px 14px;
     gap:0;
+  }
+
+  /* Row 1: Logo left only */
+  .topbar-left{
+    width:100%;
+    gap:8px;
+    margin-bottom:10px;
+  }
+
+  /* Row 2: [BTC ETH SOL GAS] [Connect Wallet] — single nowrap line */
+  .topbar-right{
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    gap:8px;
     margin-left:0;
+    flex-wrap:nowrap;
+    width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+    padding-bottom:4px;
   }
-  #walletFab{
-    order:1;
-    margin-bottom:10px; /* clear separation from prices */
-    white-space:nowrap;
-  }
+  .topbar-right::-webkit-scrollbar{ display:none; }
+
+  /* Prices row: inline, no wrap, shrink to fit */
   .topbar-prices{
-    order:2;
     display:flex;
     flex-direction:row;
     flex-wrap:nowrap;
     align-items:center;
-    justify-content:flex-end;
     gap:6px;
+    order:1;
+    flex-shrink:0;
   }
-  /* Pills: compact enough to all fit on one line */
+
+  /* Wallet: after prices, pinned right */
+  #walletFab{
+    order:2;
+    margin-left:auto;
+    flex-shrink:0;
+    white-space:nowrap;
+    padding:6px 12px;
+    font-size:11px;
+  }
+
+  /* Pills: compact, single line */
   .stat-pill{
     flex-direction:row;
     align-items:center;
     gap:3px;
-    padding:3px 7px;
+    padding:4px 8px;
     background:var(--surface2);
     border-radius:20px;
     border:1px solid var(--border);
@@ -171,34 +178,33 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     white-space:nowrap;
   }
   .stat-pill .sl{
-    font-size:7.5px;
+    font-size:8px;
     letter-spacing:.03em;
     color:var(--text3);
     text-transform:uppercase;
   }
   .stat-pill .sv{
-    font-size:11px;
+    font-size:11.5px;
     font-weight:700;
     color:var(--text);
   }
-  .stat-pill .sv span{display:none;}
-  .stat-pill .sv .price-val{display:inline;}
-  /* Title area */
-  .page-label{font-size:13px;}
-  .page-sublabel{font-size:10px;margin-top:2px;}
-  .live-dot{width:6px;height:6px;}
-  #clk{display:none;}
-  /* Layout */
-  .left-panel{display:none;}
-  .bot-layout{grid-template-columns:1fr;}
-  .cgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
-  .pipeline{grid-template-columns:1fr 1fr;}
-  .collab-stats{grid-template-columns:1fr 1fr;}
-  .collab-form-grid{grid-template-columns:1fr 1fr;}
-  .radar-grid{grid-template-columns:1fr;}
-  .page{padding:14px 12px;}
-  .page-title{font-size:20px;}
-  .page-desc{font-size:11.5px;}
+  .stat-pill .sv span{ display:none; }
+  .stat-pill .sv .price-val{ display:inline; }
+
+  .page-label{ font-size:13px; }
+  .page-sublabel{ font-size:10px; margin-top:2px; }
+  .live-dot{ width:6px; height:6px; }
+  #clk{ display:none; }
+  .left-panel{ display:none; }
+  .bot-layout{ grid-template-columns:1fr; }
+  .cgrid{ grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
+  .pipeline{ grid-template-columns:1fr 1fr; }
+  .collab-stats{ grid-template-columns:1fr 1fr; }
+  .collab-form-grid{ grid-template-columns:1fr 1fr; }
+  .radar-grid{ grid-template-columns:1fr; }
+  .page{ padding:14px 12px; }
+  .page-title{ font-size:20px; }
+  .page-desc{ font-size:11.5px; }
 }
 
 /* ── SMALL PHONES ≤480px ── */
