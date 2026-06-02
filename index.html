@@ -1183,31 +1183,41 @@ function renderMkt(data){
   }).join('');
 }
 
-/* X TWITTER EMBEDS */
+/* X SIGNAL FEED — direct profile cards, no embed widget */
 function loadTwEmbeds(){
-  const feed=$('twFeed');feed.innerHTML='';
-  const twTheme = document.documentElement.getAttribute('data-theme')==='day' ? 'light' : 'dark';
-  STATE.tracked.slice(0,3).forEach(h=>{
-    const slot=document.createElement('div');slot.className='tw-slot';
-    slot.innerHTML=`<div class="tw-lbl">@${h}</div><a class="twitter-timeline" data-theme="${twTheme}" data-chrome="noheader nofooter noborders transparent" data-tweet-limit="1" data-dnt="true" href="https://twitter.com/${h}?ref_src=twsrc%5Etfw"></a>`;
-    feed.appendChild(slot);
-  });
-  if(!window.twttr){
-    const s=document.createElement('script');s.src='https://platform.twitter.com/widgets.js';s.charset='utf-8';s.async=true;
-    s.onload=()=>{if(window.twttr?.widgets){window.twttr.widgets.load();setApi('x','live','X Embeds: LIVE');$('xSt').textContent='X LIVE ✓';log('X: Twitter widgets loaded','ok');}};
-    s.onerror=()=>{setApi('x','error','X: blocked by browser');$('xSt').textContent='X: BLOCKED';$('xSt').classList.remove('on');loadXFallback();};
-    document.head.appendChild(s);
-  }else{window.twttr.widgets.load();setApi('x','live','X Embeds: LIVE');}
+  const feed=$('twFeed');
+  // Curated signal accounts shown as clickable profile cards
+  const accounts=[
+    {h:'nftculture',    label:'NFT Culture',    bio:'NFT market coverage, drops & alpha'},
+    {h:'OmistaBTC',     label:'Omista BTC',     bio:'Bitcoin Ordinals alpha & inscriptions'},
+    {h:'thebeaksart',   label:'The Beaks',      bio:'Art drops & WL campaigns'},
+    {h:'ordinalswallet',label:'Ordinals Wallet', bio:'BTC Ordinals ecosystem news'},
+    {h:'The_sugargirl', label:'The Sugar Girl',  bio:'NFT market signals & gems'},
+  ];
+  // Show tracked accounts — add any custom ones first
+  const toShow=[...STATE.tracked.slice(0,5)];
+  const extra=accounts.filter(a=>!toShow.some(t=>t.toLowerCase()===a.h.toLowerCase()));
+  const merged=[...toShow.map(h=>accounts.find(a=>a.h.toLowerCase()===h.toLowerCase())||{h,label:'@'+h,bio:'Tracked account'}),...extra].slice(0,5);
+
+  feed.innerHTML=merged.map(a=>`
+    <div class="tw-slot" style="cursor:pointer;" onclick="window.open('https://x.com/${a.h}','_blank')">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <span class="tw-lbl">@${a.h}</span>
+        <span style="font-size:9px;color:var(--text3);">X ↗</span>
+      </div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.4;">${a.label} &mdash; ${a.bio}</div>
+      <div style="display:flex;gap:6px;margin-top:7px;">
+        <a href="https://x.com/${a.h}" target="_blank" style="font-size:9px;padding:2px 8px;background:var(--surface3);border:1px solid var(--border2);border-radius:10px;color:var(--accent);text-decoration:none;font-weight:600;">View Feed ↗</a>
+        <a href="https://x.com/search?q=nft+mint&src=typed_query&f=live" target="_blank" style="font-size:9px;padding:2px 8px;background:var(--surface3);border:1px solid var(--border2);border-radius:10px;color:var(--text3);text-decoration:none;">Search Mints</a>
+      </div>
+    </div>`).join('');
+
+  setApi('x','live','X: Signal links ready');
+  $('xSt').textContent='X LIVE ✓';
+  log('X signal feed loaded — click any card to open on X','ok');
 }
 
-function loadXFallback(){
-  $('twFeed').innerHTML=[
-    {h:'@thebeaksart',b:'The Beaks campaign LIVE. <b>150 WL spots</b> available. Submit UGC — 7 days.',t:'CAMPAIGN'},
-    {h:'@omistabtc',b:'identityMD mint open. Direct Etherscan. Ids 1-2000. <b>Community alpha 🔥</b>',t:'ALPHA'},
-    {h:'@nftculture',b:'Alpha is flowing. New drops surfacing every hour — Tracker has them before they trend.',t:'UPDATE'},
-    {h:'@ordinalswallet',b:'Bitcoin NFT volume up 34% this week. Inscriptions hitting new ATH counts.',t:'SIGNAL'},
-  ].map(s=>`<div class="si"><div class="si-top"><span class="si-h">${s.h}</span><span class="si-t">recent</span></div><div class="si-b">${s.b}</div><span class="si-tag">${s.t}</span></div>`).join('');
-}
+function loadXFallback(){ loadTwEmbeds(); }
 
 /* ETH + GAS */
 // loadEth delegates to unified loadPrices
@@ -2196,42 +2206,52 @@ async function scanEth(){
   try{
     const br=await fetch(ETH_RPC,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',method:'eth_blockNumber',params:[],id:1})});
     const bd=await br.json();const latest=parseInt(bd.result,16);
-    if(!RADAR.lastEthBlock){RADAR.lastEthBlock=latest-2;}
+    if(!RADAR.lastEthBlock){RADAR.lastEthBlock=latest-3;} // only scan last 3 blocks per tick
     if(latest<=RADAR.lastEthBlock)return;
+    const fromBlock=Math.max(RADAR.lastEthBlock,latest-5); // cap range to 5 blocks max
     const addresses=RADAR.watchList.filter(w=>w.chain==='ETH').map(w=>w.address);
-    const filter={fromBlock:'0x'+RADAR.lastEthBlock.toString(16),toBlock:'0x'+latest.toString(16),topics:[TRANSFER_TOPIC,ZERO_ADDR],...(addresses.length?{address:addresses}:{})};
+    const filter={
+      fromBlock:'0x'+fromBlock.toString(16),
+      toBlock:'0x'+latest.toString(16),
+      topics:[TRANSFER_TOPIC,ZERO_ADDR],
+      ...(addresses.length?{address:addresses}:{})
+    };
     const lr=await fetch(ETH_RPC,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',method:'eth_getLogs',params:[filter],id:2})});
-    const ld=await lr.json();const logs=ld.result||[];
+    const ld=await lr.json();
+    if(ld.error){log('ETH Radar: '+ld.error.message,'warn');RADAR.lastEthBlock=latest;return;}
+    const logs=ld.result||[];
     RADAR.lastEthBlock=latest;
     const seen=new Set(RADAR.events.filter(e=>e.chain==='ETH').map(e=>e.id));
     const minVal=parseFloat($('radarMinVal')?.value)||0;
-    for(const l of logs.slice(0,20)){
+    for(const l of logs.slice(0,15)){
       const id=l.transactionHash+'_'+(l.topics[3]||'0');
       if(seen.has(id))continue;
-      const tokenId=parseInt(l.topics[3]||'0x0',16);
-      let value=0;
-      if(minVal>0){try{const tr=await fetch(ETH_RPC,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',method:'eth_getTransactionByHash',params:[l.transactionHash],id:3})});const td=await tr.json();value=parseInt(td.result?.value||'0x0',16)/1e18;if(value<minVal)continue;}catch(e){}}
-      addRadarEvent({id,chain:'ETH',type:'new-mint',title:'New ETH Mint',contract:l.address,tokenId,txHash:l.transactionHash,blockNum:parseInt(l.blockNumber,16),value,ts:Date.now()});
-      fireNotif('New ETH Mint',l.address.slice(0,12)+'\u2026 Token #'+tokenId+(value>0?' \u2014 '+value.toFixed(4)+'\u039E':''),'ETH');
+      const tokenId=l.topics[3]?parseInt(l.topics[3],16):null;
+      addRadarEvent({id,chain:'ETH',type:'new-mint',title:'New ETH Mint',contract:l.address,tokenId,txHash:l.transactionHash,blockNum:parseInt(l.blockNumber,16),value:0,ts:Date.now()});
+      fireNotif('New ETH Mint',l.address.slice(0,12)+'… Token '+(tokenId!==null?'#'+tokenId:'minted'),'ETH');
     }
+    if(logs.length) log('ETH Radar: '+logs.length+' mint event(s) in blocks '+fromBlock+'-'+latest,'ok');
   }catch(e){log('Radar ETH error: '+e.message,'warn');}
 }
 async function scanBtc(){
   try{
-    const r=await corsGet(HIRO_INSC+'?order_by=genesis_block_height&order=desc&limit=20');
+    const r=await fetch('https://api.hiro.so/ordinals/v1/inscriptions?order_by=genesis_block_height&order=desc&limit=15');
     const d=await r.json();const inscriptions=d.results||[];
     if(!inscriptions.length)return;
     const latestId=inscriptions[0].id;
     if(RADAR.lastBtcInscription===latestId)return;
     const seen=new Set(RADAR.events.filter(e=>e.chain==='BTC').map(e=>e.id));
     const slugs=RADAR.watchList.filter(w=>w.chain==='BTC').map(w=>w.address.toLowerCase());
-    for(const insc of inscriptions.slice(0,10)){
+    let found=0;
+    for(const insc of inscriptions){
       if(seen.has(insc.id))continue;
       if(slugs.length&&!slugs.some(s=>insc.collection_id?.toLowerCase().includes(s)))continue;
       addRadarEvent({id:insc.id,chain:'BTC',type:'new-inscription',title:'New Inscription',contract:insc.collection_id||'uncategorized',tokenId:insc.number,txHash:insc.genesis_tx_id,blockNum:insc.genesis_block_height,value:0,ts:Date.now()});
       fireNotif('New Ordinal Inscription','#'+insc.number+' — '+(insc.collection_id||'uncategorized'),'BTC');
+      found++;
     }
     RADAR.lastBtcInscription=latestId;
+    if(found) log('BTC Radar: '+found+' new inscription(s)','ok');
   }catch(e){log('Radar BTC error: '+e.message,'warn');}
 }
 async function scanSol(){
@@ -2487,8 +2507,8 @@ function toggleTheme(){
     document.getElementById('topt-night').classList.remove('active');
     localStorage.setItem('mf-theme','day');
   }
-  // Reload tweet embeds with correct theme
-  if(window.twttr?.widgets) loadTwEmbeds();
+  // Reload signal feed cards with correct theme
+  loadTwEmbeds();
 }
 (function(){
   const saved = localStorage.getItem('mf-theme');
