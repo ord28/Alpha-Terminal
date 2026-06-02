@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <title>Alpha Terminal</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -254,30 +254,76 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 @media(max-width:900px){
   .left-panel{display:none;}
   .bot-layout{grid-template-columns:1fr;}
-  .cgrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+  .cgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+  .pipeline{grid-template-columns:1fr 1fr;}
+  .collab-stats{grid-template-columns:1fr 1fr;}
+  .collab-form-grid{grid-template-columns:1fr 1fr;}
+  .radar-grid{grid-template-columns:1fr;}
 
-  /* TOPBAR — stack brand + prices vertically, compact */
-  .topbar{padding:10px 14px;flex-wrap:wrap;gap:6px;}
-  .topbar-left{gap:8px;flex:1;min-width:0;}
-  .page-label{font-size:13px;}
-  .page-sublabel{font-size:10px;}
-  .topbar-right{gap:0;flex-shrink:0;}
+  /* TOPBAR */
+  .topbar{padding:8px 12px;flex-wrap:nowrap;gap:8px;align-items:center;}
+  .topbar-left{gap:6px;flex-shrink:0;min-width:0;}
+  .page-label{font-size:12px;letter-spacing:0;}
+  .page-sublabel{display:none;}
+  .topbar-right{gap:6px;flex-shrink:0;align-items:center;}
 
-  /* Prices in a single horizontal row on mobile */
-  .stat-pill{flex-direction:row;align-items:center;gap:4px;padding:4px 8px;background:var(--surface2);border-radius:20px;border:1px solid var(--border);}
-  .stat-pill .sl{font-size:8px;color:var(--text3);letter-spacing:.04em;}
+  /* Hide SOL pill on tablet to save space */
+  #solPill{display:none;}
+
+  .stat-pill{flex-direction:row;align-items:center;gap:3px;padding:3px 7px;background:var(--surface2);border-radius:20px;border:1px solid var(--border);}
+  .stat-pill .sl{font-size:7.5px;color:var(--text3);letter-spacing:.03em;}
   .stat-pill .sv{font-size:11px;font-weight:700;}
-  .stat-pill .sv span{font-size:9px;}
+  .stat-pill .sv span{display:none;}
 
-  /* Hide % change label on mobile — too cramped */
-  .stat-pill .sv span:last-child{display:none;}
+  /* Compact Connect Wallet */
+  #walletFab{padding:5px 10px;font-size:10.5px;margin-left:4px;}
+  #walletFab span:first-child{display:none;}
+
+  /* Gas pill compact */
+  #gasPill{padding:3px 7px;}
+  #gweiP{font-size:10px;}
 
   #clk{display:none;}
   .live-dot{width:6px;height:6px;}
-
-  /* Pages */
-  .page{padding:16px 14px;}
+  .page{padding:14px 12px;}
   .page-title{font-size:20px;}
+  .page-desc{font-size:11.5px;}
+}
+
+@media(max-width:480px){
+  .topbar{padding:7px 8px;}
+  .page-label{font-size:11px;}
+
+  /* On small phones hide GAS and ETH pills, keep only BTC */
+  #gasPill{display:none;}
+  #ethPill{display:none;}
+
+  .stat-pill{padding:3px 5px;}
+  .stat-pill .sl{font-size:7px;}
+  .stat-pill .sv{font-size:10px;}
+
+  #walletFab{padding:5px 9px;font-size:10px;}
+
+  .sidebar{width:50px;}
+  .nav-item{width:42px;padding:8px 2px;}
+  .nav-item span{font-size:7.5px;}
+  .nav-icon{width:24px;height:24px;}
+  .logo-icon{width:30px;height:30px;font-size:15px;}
+
+  .page{padding:10px 8px;}
+  .page-title{font-size:18px;}
+  .cgrid{grid-template-columns:1fr 1fr;}
+  .pipeline{grid-template-columns:1fr;}
+  .collab-stats{grid-template-columns:1fr 1fr;}
+  .collab-form-grid{grid-template-columns:1fr;}
+  .bot-layout{grid-template-columns:1fr;}
+
+  /* FAB stays clear of content */
+  #fabContainer{bottom:14px;right:14px;}
+
+  /* Onboarding modal full screen on mobile */
+  #onboardModal .modal{padding:20px 16px;width:100%;max-width:100%;border-radius:0;min-height:100vh;overflow-y:auto;}
+  #onboardModal .modal > div:first-child{grid-template-columns:1fr;}
 }
 
 /* ── COLLABS ── */
@@ -322,18 +368,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .cdm-inner h2{font-family:var(--font-d);font-size:20px;font-weight:800;margin-bottom:4px;}
 .timeline-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .pipe-add-btn{margin-top:auto;padding-top:8px;}
-@media(max-width:480px){
-  .topbar{padding:8px 10px;}
-  .page-label{font-size:12px;letter-spacing:0;}
-  .stat-pill{padding:3px 6px;}
-  .stat-pill .sl{font-size:7px;}
-  .stat-pill .sv{font-size:10px;}
-  .sidebar{width:52px;}
-  .nav-item{width:44px;}
-  .nav-item span{font-size:8px;}
-  .nav-icon{width:26px;height:26px;}
-  .page{padding:12px 10px;}
-}
 /* ── RADAR ── */
 .radar-grid{display:grid;grid-template-columns:340px 1fr;gap:18px;}
 .radar-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
@@ -426,8 +460,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <div class="topbar-right">
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:nowrap;">
         <div class="stat-pill"><span class="sl">BTC</span><span class="sv" id="btcP">$&mdash;</span></div>
-        <div class="stat-pill"><span class="sl">ETH</span><span class="sv" id="ethP">$&mdash;</span></div>
-        <div class="stat-pill"><span class="sl">SOL</span><span class="sv" id="solP">$&mdash;</span></div>
+        <div class="stat-pill" id="ethPill"><span class="sl">ETH</span><span class="sv" id="ethP">$&mdash;</span></div>
+        <div class="stat-pill" id="solPill"><span class="sl">SOL</span><span class="sv" id="solP">$&mdash;</span></div>
       </div>
       <div id="clk" style="display:none;">--:--:--</div>
       <div class="stat-pill" id="gasPill" title="ETH gas price"><span class="sl">GAS</span><span class="sv" id="gweiP" style="color:var(--green);">— gwei</span></div>
@@ -641,6 +675,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
             </div>
 
             <button class="btn btn-primary" id="addTask" style="width:100%;justify-content:center;padding:10px;">+ Queue Task</button>
+
+            <div class="lf" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+              <label>Etherscan API Key <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0;">(for ABI fetch)</span></label>
+              <input type="text" id="etherscanKey" placeholder="YourApiKeyToken" style="font-family:monospace;font-size:11px;"/>
+              <div class="lf-note">Get a free key at <a href="https://etherscan.io/apis" target="_blank" style="color:var(--accent);">etherscan.io/apis</a>. Used only to fetch contract ABI.</div>
+            </div>
           </div>
 
           <div>
@@ -1675,6 +1715,205 @@ $('importKeyConfirm').addEventListener('click', async()=>{
   }
 });
 
+// ── MINT ENGINE ────────────────────────────────────────────
+// ABI fetching, mint function detection, price detection,
+// arg building, simulation, tx execution + brute-force fallback
+
+const ETHERSCAN_API_KEY = 'YourApiKeyToken'; // default — overridden by user input
+let ETHERSCAN_API_KEY_RT = ETHERSCAN_API_KEY;
+
+async function fetchABI(address){
+  const url=`https://api.etherscan.io/api?module=contract&action=getabi&address=${address}&apikey=${ETHERSCAN_API_KEY_RT}`;
+  const sources=[
+    url,
+    `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+  ];
+  for(const src of sources){
+    try{
+      const res=await fetch(src);
+      const data=await res.json();
+      if(data.status==='1'&&data.result) return JSON.parse(data.result);
+    }catch(e){}
+  }
+  throw new Error('ABI not found — contract may not be verified on Etherscan');
+}
+
+function rankFunctions(funcs){
+  const priority=['mint','public','buy','claim','purchase','free'];
+  return funcs.sort((a,b)=>{
+    const aS=priority.findIndex(p=>a.name.toLowerCase().includes(p));
+    const bS=priority.findIndex(p=>b.name.toLowerCase().includes(p));
+    return(aS===-1?99:aS)-(bS===-1?99:bS);
+  });
+}
+
+function findMintFunctions(abi){
+  const funcs=abi.filter(fn=>
+    fn.type==='function'&&
+    (fn.stateMutability==='payable'||fn.stateMutability==='nonpayable')&&
+    /mint|buy|claim|purchase|free/i.test(fn.name)
+  );
+  return rankFunctions(funcs);
+}
+
+async function detectPrice(contractAddress,provider){
+  const abi=[
+    'function publicSalePrice() view returns (uint256)',
+    'function mintPrice() view returns (uint256)',
+    'function price() view returns (uint256)',
+    'function cost() view returns (uint256)',
+    'function getPrice() view returns (uint256)',
+    'function publicPrice() view returns (uint256)',
+    'function salePrice() view returns (uint256)',
+    'function tokenPrice() view returns (uint256)',
+    'function PRICE() view returns (uint256)',
+    'function MINT_PRICE() view returns (uint256)',
+    'function currentPrice() view returns (uint256)',
+    'function getMintPrice() view returns (uint256)',
+    'function pricePerToken() view returns (uint256)',
+    'function mintCost() view returns (uint256)',
+    'function presalePrice() view returns (uint256)'
+  ];
+  const contract=new ethers.Contract(contractAddress,abi,provider);
+  const methods=['publicSalePrice','mintPrice','price','cost','getPrice','publicPrice','salePrice','tokenPrice','PRICE','MINT_PRICE','currentPrice','getMintPrice','pricePerToken','mintCost','presalePrice'];
+  for(const m of methods){
+    try{
+      const p=await contract[m]();
+      if(p&&p.toString()!=='0') return ethers.utils.formatEther(p);
+    }catch(e){}
+  }
+  return null;
+}
+
+function buildArgs(fn,qty,addr){
+  if(!fn.inputs||fn.inputs.length===0) return [];
+  return fn.inputs.map(inp=>{
+    const t=inp.type;
+    if(t.includes('uint')) return qty;
+    if(t==='address')      return addr;
+    if(t==='bool')         return true;
+    if(t==='bytes')        return '0x';
+    return qty;
+  });
+}
+
+async function executeMint(contractAddr,signer,qty,options={}){
+  const{maxGas=50,tip=2,manualPrice=null}=options;
+
+  // Network check
+  try{
+    const network=await signer.provider.getNetwork();
+    if(network.chainId!==1) throw new Error(`Wrong network: "${network.name}" (chain ${network.chainId}). Switch to Ethereum Mainnet.`);
+    log('Network: Ethereum Mainnet ✓','ok');
+  }catch(e){
+    if(e.message.includes('Wrong network')) throw e;
+    log('Could not verify network — proceeding','warn');
+  }
+
+  const maxFeePerGas=ethers.utils.parseUnits(String(maxGas),'gwei');
+  const maxPriorityFeePerGas=ethers.utils.parseUnits(String(tip),'gwei');
+  const addr=await signer.getAddress();
+
+  // ── Route 1: ABI-aware ──
+  try{
+    log('Fetching ABI from Etherscan…','info');
+    const abi=await fetchABI(contractAddr);
+    const contract=new ethers.Contract(contractAddr,abi,signer);
+    const mintFns=findMintFunctions(abi);
+    if(!mintFns.length) throw new Error('No mint function found in ABI');
+    log(`Found ${mintFns.length} mint function(s): ${mintFns.map(f=>f.name).join(', ')}','info`);
+
+    let unitPrice;
+    if(manualPrice!==null&&manualPrice>0){
+      unitPrice=ethers.utils.parseEther(String(manualPrice));
+      log('Price (manual): '+manualPrice+' ETH','info');
+    }else{
+      const detected=await detectPrice(contractAddr,signer.provider);
+      unitPrice=detected?ethers.utils.parseEther(detected):ethers.utils.parseEther('0');
+      log('Price (detected): '+ethers.utils.formatEther(unitPrice)+' ETH','info');
+    }
+
+    for(const fn of mintFns){
+      try{
+        log('Trying: '+fn.name+'()','info');
+        const args=buildArgs(fn,qty,addr);
+        let value=unitPrice.mul(qty);
+
+        // Simulate
+        try{
+          await contract.callStatic[fn.name](...args,{value});
+          log('Simulation passed ✓','ok');
+        }catch(simErr){
+          try{
+            await contract.callStatic[fn.name](...args);
+            value=ethers.constants.Zero;
+            log('Simulation passed (free mint) ✓','ok');
+          }catch(e){
+            log('Simulation failed — skipping '+fn.name,'warn');
+            continue;
+          }
+        }
+
+        let gasLimit=300000;
+        try{
+          const est=await contract.estimateGas[fn.name](...args,{value});
+          gasLimit=Math.ceil(est.toNumber()*1.2);
+          log('Gas estimated: '+gasLimit,'info');
+        }catch(e){ log('Gas estimation failed — using 300k fallback','warn'); }
+
+        const tx=await contract[fn.name](...args,{value,maxFeePerGas,maxPriorityFeePerGas,gasLimit});
+        log('TX sent: '+tx.hash,'ok');
+        const receipt=await tx.wait();
+        const gasUsed=receipt.gasUsed?.toString()||'?';
+        const block=receipt.blockNumber||'?';
+        log(`✅ Mint confirmed! Block ${block} · Gas used: ${gasUsed}`,'ok');
+        return{success:true,hash:tx.hash,block,gasUsed};
+      }catch(err){
+        if(err.code===4001) throw new Error('Rejected by user');
+        log('Failed: '+fn.name+' — '+(err.reason||err.message).slice(0,80),'warn');
+      }
+    }
+    throw new Error('All ABI functions failed');
+  }catch(abiErr){
+    if(abiErr.message==='Rejected by user') throw abiErr;
+    log('ABI route failed: '+abiErr.message,'warn');
+    log('Trying brute-force signatures…','info');
+  }
+
+  // ── Route 2: Brute-force ──
+  const SIGS=['mint(uint256)','mint()','publicMint(uint256)','publicMint()','buy(uint256)','buy()','claim(uint256)','claim()','purchase(uint256)','freeMint(uint256)','freeMint()'];
+  const bruteValue=manualPrice?ethers.utils.parseEther(String(manualPrice*qty)):ethers.utils.parseEther('0');
+
+  for(const sig of SIGS){
+    try{
+      log('Trying: '+sig,'info');
+      const iface=new ethers.utils.Interface(['function '+sig]);
+      const fnName=sig.split('(')[0];
+      const data=sig.includes('uint256')?iface.encodeFunctionData(fnName,[qty]):iface.encodeFunctionData(fnName);
+
+      let gasLimit=300000;
+      try{
+        const est=await signer.estimateGas({to:contractAddr,value:bruteValue,data});
+        gasLimit=Math.ceil(est.toNumber()*1.2);
+        log('Gas estimated: '+gasLimit,'info');
+      }catch(e){}
+
+      const tx=await signer.sendTransaction({to:contractAddr,value:bruteValue,data,maxFeePerGas,maxPriorityFeePerGas,gasLimit});
+      log('TX sent: '+tx.hash,'ok');
+      const receipt=await tx.wait();
+      const gasUsed=receipt.gasUsed?.toString()||'?';
+      const block=receipt.blockNumber||'?';
+      log(`✅ Mint confirmed! Block ${block} · Gas used: ${gasUsed}`,'ok');
+      return{success:true,hash:tx.hash,block,gasUsed};
+    }catch(err){
+      if(err.code===4001) throw new Error('Rejected by user');
+      log('Failed: '+sig,'warn');
+    }
+  }
+  throw new Error('All mint attempts failed');
+}
+
 // ── TX Broadcast Engine ──
 let _pendingTask = null;
 
@@ -1690,7 +1929,7 @@ function openModal(t){
     <div class="tx-row"><span class="tx-k">TO</span><span class="tx-v">${(t.contract||'—').slice(0,14)}…${(t.contract||'').slice(-6)}</span></div>
     <div class="tx-row"><span class="tx-k">QTY</span><span class="tx-v">${t.qty}</span></div>
     <div class="tx-row"><span class="tx-k">VALUE</span><span class="tx-v">${tot.toFixed(4)} ${chainSymbol} ≈ $${usd}</span></div>`;
-  if(chain==='ETH') rows+=`<div class="tx-row"><span class="tx-k">FUNCTION</span><span class="tx-v">${t.fn}</span></div><div class="tx-row"><span class="tx-k">GAS MAX</span><span class="tx-v">${t.maxGas} gwei</span></div>`;
+  if(chain==='ETH') rows+=`<div class="tx-row"><span class="tx-k">ENGINE</span><span class="tx-v" style="color:var(--green);">ABI-aware + brute-force fallback</span></div><div class="tx-row"><span class="tx-k">GAS MAX</span><span class="tx-v">${t.maxGas||50} gwei</span></div>`;
   if(chain==='BTC') rows+=`<div class="tx-row"><span class="tx-k">MAX FEE</span><span class="tx-v">${t.maxSats} sats/vB</span></div>`;
   if(chain==='SOL') rows+=`<div class="tx-row"><span class="tx-k">PRIORITY</span><span class="tx-v">${(t.microLamports||100000).toLocaleString()} μSOL</span></div>`;
   $('txPrev').innerHTML=rows;
@@ -1707,7 +1946,7 @@ function openModal(t){
   };
 
   $('modal').classList.add('show');
-  log(`[${chain}] TX ready — burner signing`,'info');
+  log(`[${chain}] TX ready — mint engine standing by`,'info');
 }
 
 $('broadcastBtn').addEventListener('click', async()=>{
@@ -1722,53 +1961,49 @@ $('broadcastBtn').addEventListener('click', async()=>{
   }
 
   $('broadcastBtn').disabled=true;
-  $('broadcastBtn').textContent='⏳ Broadcasting…';
+  $('broadcastBtn').textContent='⏳ Running mint engine…';
   bs.style.display='block'; bs.style.background='rgba(245,200,66,.08)'; bs.style.color='var(--yellow)'; bs.style.border='1px solid rgba(245,200,66,.2)';
-  bs.textContent='Signing and broadcasting transaction…';
+  bs.textContent='Fetching ABI & detecting mint function…';
 
   try{
     if(chain==='ETH'){
       await loadEthers();
-      const provider = new ethers.providers.JsonRpcProvider('https://ethereum.publicnode.com');
-      const wallet = new ethers.Wallet(BURNER.privateKey, provider);
-      const tot = t.price * t.qty;
-      const value = ethers.utils.parseEther(tot.toFixed(6));
-      // Build calldata
-      const iface = new ethers.utils.Interface([`function ${t.fn||'mint(uint256)'}`]);
-      const fnName = (t.fn||'mint(uint256)').split('(')[0];
-      const data = iface.encodeFunctionData(fnName, [t.qty]);
-      const tx = await wallet.sendTransaction({
-        to: t.contract,
-        value,
-        data,
-        maxFeePerGas: ethers.utils.parseUnits(String(t.maxGas||50), 'gwei'),
-        maxPriorityFeePerGas: ethers.utils.parseUnits(String(t.tip||2), 'gwei'),
+      const provider=new ethers.providers.JsonRpcProvider('https://ethereum.publicnode.com');
+      const signer=new ethers.Wallet(BURNER.privateKey,provider);
+
+      // Read user-supplied Etherscan key
+      const userKey = $('etherscanKey')?.value?.trim();
+      if(userKey && userKey !== 'YourApiKeyToken') ETHERSCAN_API_KEY_RT = userKey;
+
+      const result=await executeMint(t.contract,signer,t.qty,{
+        maxGas:t.maxGas||50,
+        tip:t.tip||2,
+        manualPrice:t.price>0?t.price:null
       });
+
       t.status='live'; renderTasks();
       bs.style.background='rgba(16,217,122,.1)'; bs.style.color='var(--green)'; bs.style.border='1px solid rgba(16,217,122,.2)';
-      bs.innerHTML=`✓ Broadcast! TX: <a href="https://etherscan.io/tx/${tx.hash}" target="_blank" style="color:var(--accent);">${tx.hash.slice(0,16)}…</a>`;
-      $('broadcastBtn').textContent='✓ Sent';
-      log(`[ETH] TX broadcast: ${tx.hash.slice(0,16)}…`,'ok');
-    } else if(chain==='BTC'){
-      // BTC — open UniSat/Xverse with prefilled data, burner key shown for reference
+      bs.innerHTML=`✅ Minted! Block ${result.block} · Gas ${result.gasUsed} · <a href="https://etherscan.io/tx/${result.hash}" target="_blank" style="color:var(--accent);">View TX ↗</a>`;
+      $('broadcastBtn').textContent='✓ Confirmed';
+
+    }else if(chain==='BTC'){
       bs.style.background='rgba(249,115,22,.08)'; bs.style.color='var(--btc)'; bs.style.border='1px solid rgba(249,115,22,.2)';
-      bs.innerHTML='BTC signing: open UniSat or Xverse to complete. <a href="https://unisat.io" target="_blank" style="color:var(--btc);">UniSat ↗</a> · <a href="https://www.xverse.app" target="_blank" style="color:var(--btc);">Xverse ↗</a>';
-      $('broadcastBtn').textContent='Open Wallet';
-      $('broadcastBtn').disabled=false;
+      bs.innerHTML='BTC: open UniSat or Xverse to sign. <a href="https://unisat.io" target="_blank" style="color:var(--btc);">UniSat ↗</a> · <a href="https://www.xverse.app" target="_blank" style="color:var(--btc);">Xverse ↗</a>';
+      $('broadcastBtn').textContent='Open Wallet'; $('broadcastBtn').disabled=false;
       log('[BTC] Open UniSat or Xverse to sign Ordinals tx','warn');
-    } else if(chain==='SOL'){
+
+    }else if(chain==='SOL'){
       bs.style.background='rgba(153,69,255,.08)'; bs.style.color='#9945ff'; bs.style.border='1px solid rgba(153,69,255,.2)';
-      bs.innerHTML='SOL signing: open Phantom to complete. <a href="https://phantom.app" target="_blank" style="color:#9945ff;">Phantom ↗</a>';
-      $('broadcastBtn').textContent='Open Wallet';
-      $('broadcastBtn').disabled=false;
+      bs.innerHTML='SOL: open Phantom to sign. <a href="https://phantom.app" target="_blank" style="color:#9945ff;">Phantom ↗</a>';
+      $('broadcastBtn').textContent='Open Wallet'; $('broadcastBtn').disabled=false;
       log('[SOL] Open Phantom to sign Solana tx','warn');
     }
   }catch(e){
     bs.style.background='rgba(240,69,69,.1)'; bs.style.color='var(--red)'; bs.style.border='1px solid rgba(240,69,69,.2)';
-    bs.textContent='⚠ Broadcast failed: '+e.message;
+    bs.textContent='⚠ '+e.message;
     $('broadcastBtn').disabled=false;
     $('broadcastBtn').textContent='⚡ Retry';
-    log('[ERR] Broadcast: '+e.message,'err');
+    log('[ERR] '+e.message,'err');
   }
 });
 
@@ -2529,7 +2764,7 @@ init();
 
 <!-- ONBOARDING MODAL -->
 <div class="modal-bg" id="onboardModal" style="z-index:200;">
-  <div class="modal" style="max-width:520px;padding:32px;">
+  <div class="modal" style="max-width:520px;padding:32px;max-height:90vh;overflow-y:auto;">
     <div style="text-align:center;margin-bottom:22px;">
       <div style="width:52px;height:52px;background:linear-gradient(135deg,var(--accent),#0284c7);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px;box-shadow:0 0 24px rgba(14,165,233,.3);">🌊</div>
       <h2 style="font-size:22px;margin-bottom:6px;">Welcome to Alpha Terminal</h2>
