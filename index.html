@@ -51,14 +51,116 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .nav-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:all .18s;}
 .nav-item.active .nav-icon{box-shadow:0 4px 14px rgba(14,165,233,.4);}
 
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 26px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
-.topbar-left{display:flex;align-items:center;gap:12px;}
+/* ── TOPBAR ── */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:13px 26px;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+  flex-shrink:0;
+  /* prevent overflow clipping */
+  overflow:visible;
+}
+.topbar-left{display:flex;align-items:center;gap:12px;flex-shrink:0;}
 .topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.topbar-prices{display:flex;align-items:center;gap:8px;}
+.topbar-prices{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+/* ── MOBILE TOPBAR — vertical stack ── */
+@media(max-width:768px){
+  .topbar{
+    flex-wrap:wrap;
+    padding:10px 14px;
+    gap:0;
+    row-gap:8px;
+    align-items:center;
+  }
+  /* Row 1: Logo left, wallet right */
+  .topbar-left{
+    flex:1;
+    min-width:0;
+    gap:8px;
+    order:1;
+  }
+  .topbar-right{
+    order:2;
+    flex-shrink:0;
+    /* column direction so wallet is above prices */
+    flex-direction:column;
+    align-items:flex-end;
+    gap:6px;
+  }
+  /* Wallet button — right-aligned, no left margin */
+  #walletFab{
+    margin-left:0 !important;
+    order:1;
+    white-space:nowrap;
+  }
+  /* Prices row — sits below wallet */
+  .topbar-prices{
+    order:2;
+    gap:5px;
+  }
+  .page-sublabel{font-size:10px;color:var(--text3);}
+  .page-label{font-size:13px;}
+  .live-dot{width:6px;height:6px;}
+  #clk{display:none;}
+  /* stat pills compact */
+  .stat-pill{
+    flex-direction:row;
+    align-items:center;
+    gap:3px;
+    padding:3px 8px;
+    background:var(--surface2);
+    border-radius:20px;
+    border:1px solid var(--border);
+  }
+  .stat-pill .sl{font-size:7.5px;letter-spacing:.03em;}
+  .stat-pill .sv{font-size:11px;font-weight:700;}
+  .stat-pill .sv span{display:none;}
+  /* ── Layout ── */
+  .left-panel{display:none;}
+  .bot-layout{grid-template-columns:1fr;}
+  .cgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+  .pipeline{grid-template-columns:1fr 1fr;}
+  .collab-stats{grid-template-columns:1fr 1fr;}
+  .collab-form-grid{grid-template-columns:1fr 1fr;}
+  .radar-grid{grid-template-columns:1fr;}
+  .page{padding:14px 12px;}
+  .page-title{font-size:20px;}
+  .page-desc{font-size:11.5px;}
+}
+
+/* ── SMALL PHONES ── */
+@media(max-width:480px){
+  .topbar{padding:8px 10px;}
+  .page-label{font-size:12px;letter-spacing:0;}
+  .page-sublabel{display:none;}
+  #solPill{display:none;}
+  #gasPill{display:none;}
+  #walletFab{padding:5px 12px;font-size:10.5px;}
+  .stat-pill{padding:3px 6px;}
+  .stat-pill .sl{font-size:7px;}
+  .stat-pill .sv{font-size:10px;}
+  .sidebar{width:50px;}
+  .nav-item{width:42px;padding:8px 2px;}
+  .nav-item span{font-size:7.5px;}
+  .nav-icon{width:24px;height:24px;}
+  .logo-icon{width:30px;height:30px;font-size:15px;}
+  .page{padding:10px 8px;}
+  .page-title{font-size:18px;}
+  .cgrid{grid-template-columns:1fr 1fr;}
+  .pipeline{grid-template-columns:1fr;}
+  .collab-stats{grid-template-columns:1fr 1fr;}
+  .collab-form-grid{grid-template-columns:1fr;}
+  #fabContainer{bottom:14px;right:14px;}
+  #onboardModal .modal{padding:20px 16px;width:100%;max-width:100%;border-radius:0;min-height:100vh;overflow-y:auto;}
+}
 .page-label{font-family:var(--font-d);font-weight:800;font-size:16px;letter-spacing:-.02em;background:linear-gradient(90deg,#fff 0%,#38bdf8 40%,#fff 60%,#0ea5e9 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glow-sweep 3s linear infinite;filter:drop-shadow(0 0 8px rgba(14,165,233,.5));}
 @keyframes glow-sweep{0%{background-position:0% center}100%{background-position:200% center}}
 .page-sublabel{font-size:11.5px;color:var(--text2);}
-.topbar-right{display:flex;align-items:center;gap:18px;}
+/* stat-pill — desktop: column layout */
 .stat-pill{display:flex;flex-direction:column;align-items:flex-end;}
 .stat-pill .sl{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;}
 .stat-pill .sv{font-size:13.5px;font-weight:700;color:var(--text);}
@@ -252,94 +354,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .w-btn{display:block;padding:10px;background:linear-gradient(135deg,var(--accent),#0284c7);color:#fff;font-family:var(--font-b);font-weight:700;font-size:11.5px;text-decoration:none;text-align:center;cursor:pointer;border:none;border-radius:var(--radius-sm);}
 .w-btn:hover{opacity:.9;}
 .w-btn.alt{background:var(--surface2);color:var(--accent);border:1px solid var(--border3);}
-
-@media(max-width:768px){
-  /* Topbar wraps into two rows */
-  .topbar{
-    padding:10px 14px;
-    flex-wrap:wrap;
-    gap:0;
-    align-items:center;
-  }
-  .topbar-left{
-    flex:1;
-    min-width:0;
-    gap:8px;
-  }
-  /* Right side stacks: wallet on top row, prices below */
-  .topbar-right{
-    flex-direction:column;
-    align-items:flex-end;
-    gap:6px;
-    flex-shrink:0;
-  }
-  /* Wallet button — right-aligned, clean */
-  #walletFab{
-    margin-left:0;
-    padding:6px 14px;
-    font-size:11px;
-  }
-  /* Price row — sits below wallet, right-aligned */
-  .topbar-prices{
-    gap:5px;
-  }
-  .stat-pill{
-    flex-direction:row;
-    align-items:center;
-    gap:3px;
-    padding:3px 7px;
-    background:var(--surface2);
-    border-radius:20px;
-    border:1px solid var(--border);
-  }
-  .stat-pill .sl{font-size:7.5px;color:var(--text3);letter-spacing:.03em;}
-  .stat-pill .sv{font-size:11px;font-weight:700;}
-  .stat-pill .sv span{display:none;}
-  .page-sublabel{display:none;}
-  .page-label{font-size:13px;}
-  .live-dot{width:6px;height:6px;}
-  #clk{display:none;}
-  .left-panel{display:none;}
-  .bot-layout{grid-template-columns:1fr;}
-  .cgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
-  .pipeline{grid-template-columns:1fr 1fr;}
-  .collab-stats{grid-template-columns:1fr 1fr;}
-  .collab-form-grid{grid-template-columns:1fr 1fr;}
-  .radar-grid{grid-template-columns:1fr;}
-  .page{padding:14px 12px;}
-  .page-title{font-size:20px;}
-  .page-desc{font-size:11.5px;}
-}
-
-@media(max-width:480px){
-  .topbar{padding:8px 10px;}
-  .page-label{font-size:11px;letter-spacing:0;}
-
-  /* On small phones hide SOL and GAS pills */
-  #solPill{display:none;}
-  #gasPill{display:none;}
-  .stat-pill .sl{font-size:7px;}
-  .stat-pill .sv{font-size:10px;}
-  .stat-pill{padding:2px 6px;}
-
-  #walletFab{padding:5px 11px;font-size:10.5px;}
-
-  .sidebar{width:50px;}
-  .nav-item{width:42px;padding:8px 2px;}
-  .nav-item span{font-size:7.5px;}
-  .nav-icon{width:24px;height:24px;}
-  .logo-icon{width:30px;height:30px;font-size:15px;}
-
-  .page{padding:10px 8px;}
-  .page-title{font-size:18px;}
-  .cgrid{grid-template-columns:1fr 1fr;}
-  .pipeline{grid-template-columns:1fr;}
-  .collab-stats{grid-template-columns:1fr 1fr;}
-  .collab-form-grid{grid-template-columns:1fr;}
-
-  #fabContainer{bottom:14px;right:14px;}
-  #onboardModal .modal{padding:20px 16px;width:100%;max-width:100%;border-radius:0;min-height:100vh;overflow-y:auto;}
-}
 
 /* ── COLLABS ── */
 .pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px;}
