@@ -51,7 +51,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .nav-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:all .18s;}
 .nav-item.active .nav-icon{box-shadow:0 4px 14px rgba(14,165,233,.4);}
 
-/* ── TOPBAR ── */
+/* ══════════════════════════════════════
+   TOPBAR
+   Desktop: [Logo] ············ [BTC ETH SOL GAS] [Connect Wallet]
+   Mobile:  [Logo] ············ [Connect Wallet]
+                                [BTC ETH SOL GAS] ← under wallet
+══════════════════════════════════════ */
 .topbar{
   display:flex;
   align-items:center;
@@ -59,69 +64,101 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   border-bottom:1px solid var(--border);
   background:var(--surface);
   flex-shrink:0;
-  flex-wrap:nowrap;
   gap:16px;
 }
-.topbar-left{display:flex;align-items:center;gap:12px;flex-shrink:0;}
-.topbar-prices{display:flex;align-items:center;gap:12px;flex-shrink:0;margin-left:auto;}
-.topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.topbar-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-shrink:0;
+}
+/* Right side: row on desktop, prices before wallet */
+.topbar-right{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:12px;
+  margin-left:auto;
+  flex-shrink:0;
+}
+/* Prices: row of pills */
+.topbar-prices{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:10px;
+}
+/* Stat pill — desktop stacked label/value */
+.stat-pill{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  flex-shrink:0;
+}
+.stat-pill .sl{
+  font-size:9px;
+  color:var(--text3);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  line-height:1;
+}
+.stat-pill .sv{
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--text);
+  line-height:1.2;
+}
 
-/* ── MOBILE — stack into two rows ── */
+/* ── MOBILE ≤768px ── */
 @media(max-width:768px){
   .topbar{
     flex-wrap:wrap;
     padding:10px 14px;
-    gap:0;
-    align-items:center;
-    row-gap:8px;
+    gap:8px;
+    row-gap:0;
   }
-  /* Row 1 left: Logo */
   .topbar-left{
     flex:1;
     min-width:0;
-    order:1;
     gap:8px;
   }
-  /* Row 1 right: Wallet button */
+  /* Right side becomes a column: wallet on top, prices below */
   .topbar-right{
-    order:2;
-    margin-left:0;
-    flex-shrink:0;
-  }
-  /* Row 2: Prices — forced to own line */
-  .topbar-prices{
-    order:3;
-    width:100%;
-    margin-left:0;
-    flex-wrap:wrap;
+    flex-direction:column;
+    align-items:flex-end;
     gap:6px;
-    align-items:center;
+    margin-left:0;
   }
-  /* Pills: horizontal label + value side by side */
+  /* Prices row under wallet */
+  .topbar-prices{
+    flex-direction:row;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+    gap:5px;
+  }
+  /* Pills compact horizontal */
   .stat-pill{
-    display:flex;
     flex-direction:row;
     align-items:center;
-    gap:4px;
-    padding:4px 10px;
+    gap:3px;
+    padding:3px 8px;
     background:var(--surface2);
     border-radius:20px;
     border:1px solid var(--border);
   }
   .stat-pill .sl{
-    font-size:9px;
-    color:var(--text3);
-    letter-spacing:.04em;
-    text-transform:uppercase;
+    font-size:8px;
+    letter-spacing:.03em;
   }
   .stat-pill .sv{
-    font-size:12px;
+    font-size:11px;
     font-weight:700;
     color:var(--text);
   }
   .stat-pill .sv span{display:none;}
-  .page-sublabel{font-size:10px;}
+  .stat-pill .sv .price-val{display:inline;}
   .page-label{font-size:13px;}
+  .page-sublabel{font-size:10px;}
   .live-dot{width:6px;height:6px;}
   #clk{display:none;}
   /* Layout */
@@ -137,7 +174,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   .page-desc{font-size:11.5px;}
 }
 
-/* ── SMALL PHONES ── */
+/* ── SMALL PHONES ≤480px ── */
 @media(max-width:480px){
   .topbar{padding:8px 10px;gap:6px;}
   .page-label{font-size:12px;letter-spacing:0;}
@@ -162,10 +199,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .page-label{font-family:var(--font-d);font-weight:800;font-size:16px;letter-spacing:-.02em;background:linear-gradient(90deg,#fff 0%,#38bdf8 40%,#fff 60%,#0ea5e9 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glow-sweep 3s linear infinite;filter:drop-shadow(0 0 8px rgba(14,165,233,.5));}
 @keyframes glow-sweep{0%{background-position:0% center}100%{background-position:200% center}}
 .page-sublabel{font-size:11.5px;color:var(--text2);}
-/* stat-pill — desktop: stacked label above value */
-.stat-pill{display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0;}
-.stat-pill .sl{font-size:9px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;display:block;}
-.stat-pill .sv{font-size:13.5px;font-weight:700;color:var(--text);display:block;}
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green);animation:pulse 2s infinite;flex-shrink:0;}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
 @keyframes priceFlashUp{0%{background:rgba(16,217,122,.25);}100%{background:transparent;}}
@@ -490,21 +523,20 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       </div>
     </div>
 
-    <!-- Row 1 col 2: Prices (desktop only inline, mobile moves to row 2) -->
-    <div class="topbar-prices" id="topbarPrices">
-      <div class="stat-pill"><span class="sl">BTC</span><span class="sv" id="btcP">$&mdash;</span></div>
-      <div class="stat-pill" id="ethPill"><span class="sl">ETH</span><span class="sv" id="ethP">$&mdash;</span></div>
-      <div class="stat-pill" id="solPill"><span class="sl">SOL</span><span class="sv" id="solP">$&mdash;</span></div>
-      <div class="stat-pill" id="gasPill" title="ETH gas price"><span class="sl">GAS</span><span class="sv" id="gweiP" style="color:var(--green);">— gwei</span></div>
-    </div>
-
-    <!-- Row 1 col 3: Wallet button -->
+    <!-- Row 1 right: Wallet + prices stacked below on mobile -->
     <div class="topbar-right">
       <div id="clk" style="display:none;">--:--:--</div>
       <button id="walletFab" onclick="openWalletModal()" style="display:flex;align-items:center;gap:7px;padding:7px 14px;background:transparent;color:#22d3ee;border:1.5px solid rgba(34,211,238,.45);border-radius:20px;font-family:var(--font-b);font-size:11.5px;font-weight:700;cursor:pointer;box-shadow:0 0 12px rgba(6,182,212,.15);transition:all .2s;letter-spacing:.02em;flex-shrink:0;backdrop-filter:blur(4px);">
         <span style="font-size:14px;">🔗</span>
         <span id="walletFabLabel">Connect Wallet</span>
       </button>
+      <!-- Prices: inline on desktop (via topbar-prices flex), below wallet on mobile -->
+      <div class="topbar-prices" id="topbarPrices">
+        <div class="stat-pill"><span class="sl">BTC</span><span class="sv" id="btcP">$&mdash;</span></div>
+        <div class="stat-pill" id="ethPill"><span class="sl">ETH</span><span class="sv" id="ethP">$&mdash;</span></div>
+        <div class="stat-pill" id="solPill"><span class="sl">SOL</span><span class="sv" id="solP">$&mdash;</span></div>
+        <div class="stat-pill" id="gasPill" title="ETH gas price"><span class="sl">GAS</span><span class="sv" id="gweiP" style="color:var(--green);">— gwei</span></div>
+      </div>
     </div>
   </div>
 
@@ -1084,7 +1116,7 @@ function _flashPrice(elId, newPrice, oldPrice, decimals){
     setTimeout(()=>{ el.parentElement.style.animation=''; }, 700);
   }
   const fmt = '$'+newPrice.toLocaleString('en-US',{maximumFractionDigits:decimals});
-  el.innerHTML = `<span style="color:${color};transition:color .3s;">${fmt}</span><span style="font-size:9px;opacity:.75;margin-left:2px;color:${color};">${pct}</span>`;
+  el.innerHTML = `<span class="price-val" style="color:${color};transition:color .3s;">${fmt}</span><span class="price-pct" style="font-size:9px;opacity:.75;margin-left:2px;color:${color};">${pct}</span>`;
 }
 
 async function loadPrices(){
