@@ -745,13 +745,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
         </div>
         <div class="api-bar">
           <div class="api-i"><div class="api-dot loading" id="osDot"></div><span class="api-lbl" id="osLbl">OpenSea: connecting&hellip;</span></div>
+          <div class="api-i"><div class="api-dot loading" id="trendDot"></div><span class="api-lbl" id="trendLbl">Trending: connecting&hellip;</span></div>
           <div class="api-i"><div class="api-dot loading" id="ordDot"></div><span class="api-lbl" id="ordLbl">Ordinals: connecting&hellip;</span></div>
           <div class="api-i"><div class="api-dot loading" id="cgDot"></div><span class="api-lbl" id="cgLbl">CoinGecko: connecting&hellip;</span></div>
           <div class="api-i"><div class="api-dot loading" id="ethDot"></div><span class="api-lbl" id="ethLbl">ETH/Gas: connecting&hellip;</span></div>
           <div class="api-i"><div class="api-dot loading" id="xDot"></div><span class="api-lbl" id="xLbl">X Embeds: loading&hellip;</span></div>
         </div>
         <div class="filter-bar">
-          <div class="fg"><label>Chain</label><select class="l-sel" id="fSrc"><option value="all">All Chains</option><option value="opensea">ETH (OpenSea)</option><option value="ordinals">BTC (Ordinals)</option><option value="coingecko">CoinGecko</option></select></div>
+          <div class="fg"><label>Chain</label><select class="l-sel" id="fSrc"><option value="all">All Chains</option><option value="opensea">ETH (OpenSea Drops)</option>
+<option value="trending">ETH (Trending)</option><option value="ordinals">BTC (Ordinals)</option><option value="coingecko">CoinGecko</option></select></div>
           <div class="fg"><label>Status</label><select class="l-sel" id="fStat"><option value="all">All</option><option value="upcoming">Upcoming</option><option value="live">Minting Now</option></select></div>
           <div class="fg"><label>Sort</label><select class="l-sel" id="fSort"><option value="hype">Hype</option><option value="date">Mint Date</option><option value="supply">Supply</option><option value="price">Price</option></select></div>
           <div class="fg"><label>Search</label><input type="text" class="l-inp" id="fSrch" placeholder="collection name&hellip;"/></div>
@@ -1370,31 +1372,75 @@ async function fetchOs(){
   try{
     const key=STATE.osKey||await getOsKey();
     const h={'Accept':'application/json','x-api-key':key};
-    // Sort by created_date desc — newest/upcoming ETH drops first
-    const r=await corsGet('https://api.opensea.io/api/v2/collections?chain=ethereum&order_by=created_date&limit=20',{headers:h});
-    const d=await r.json();
-    if(!d.collections?.length)throw new Error('no data');
-    const cols=d.collections.slice(0,12).map(c=>{
-      // Estimate if upcoming: very new collections with low supply = likely pre-mint
-      const createdAt=c.created_date?new Date(c.created_date):null;
-      const ageHours=createdAt?(Date.now()-createdAt)/36e5:999;
-      const isUpcoming=ageHours<72; // created in last 3 days = treat as upcoming
-      return{
-        name:c.name||c.collection,slug:c.collection,
-        handle:'@'+(c.twitter_username||c.collection),
-        supply:parseInt(c.total_supply)||0,
-        price:null, // no floor on upcoming drops
-        image:c.image_url||null,
-        verified:c.safelist_status==='verified',
-        source:'opensea',chain:'ETH',
-        mintDate:null,
-        hype:Math.min(92,50+Math.floor(Math.random()*35)),
-        tag:isUpcoming?'NEW':'UPCOMING',
-        status:'upcoming'
-      };
-    });
+
+    // ── Primary: OpenSea /drops endpoint — the real curated drops page ──
+    let cols=[];
+    try{
+      const r=await corsGet('https://api.opensea.io/api/v2/drops?limit=20&order_by=start_date',{headers:h});
+      const d=await r.json();
+      const drops=d.results||d.drops||[];
+      if(drops.length){
+        cols=drops.map(c=>{
+          const name=c.collection_slug?c.collection_slug.replace(/-/g,' ').replace(/\w/g,l=>l.toUpperCase()):(c.name||'');
+          const slug=c.collection_slug||c.slug||'';
+          if(!name||name.length<3) return null;
+          if(name.match(/^0x[a-fA-F0-9]{6,}/)) return null;
+          const mintDate=c.start_date||c.mint_start_date||null;
+          const endDate=c.end_date||c.mint_end_date||null;
+          const now=new Date();
+          const start=mintDate?new Date(mintDate):null;
+          const end=endDate?new Date(endDate):null;
+          const isLive=start&&start<=now&&(!end||end>now);
+          const price=c.mint_price!=null?parseFloat(c.mint_price):null;
+          const handle=c.twitter_username?'@'+c.twitter_username:null;
+          return{
+            name,slug,handle,
+            supply:parseInt(c.total_supply)||0,
+            price,
+            image:c.image_url||c.banner_image_url||null,
+            verified:true,
+            source:'opensea',chain:'ETH',
+            mintDate:mintDate||null,
+            hype:Math.min(95,60+Math.floor(Math.random()*30)),
+            tag:isLive?'LIVE':'UPCOMING',
+            status:isLive?'live':'upcoming'
+          };
+        }).filter(Boolean);
+        log('OpenSea Drops: '+cols.length+' curated drops loaded','ok');
+      }
+    }catch(e){
+      log('Drops endpoint failed, falling back to collections','warn');
+    }
+
+    // ── Fallback: collections API if drops returned nothing ──
+    if(!cols.length){
+      const r=await corsGet('https://api.opensea.io/api/v2/collections?chain=ethereum&order_by=created_date&limit=24',{headers:h});
+      const d=await r.json();
+      if(!d.collections?.length) throw new Error('no data');
+      cols=d.collections.map(c=>{
+        const name=c.name||'';
+        if(!name||name.length<3) return null;
+        if(name.match(/^0x[a-fA-F0-9]{6,}/)) return null;
+        if((c.collection||'').match(/^0x[a-fA-F0-9]{6,}/)) return null;
+        const createdAt=c.created_date?new Date(c.created_date):null;
+        const ageHours=createdAt?(Date.now()-createdAt)/36e5:999;
+        const handle=c.twitter_username?'@'+c.twitter_username:null;
+        return{
+          name,slug:c.collection,handle,
+          supply:parseInt(c.total_supply)||0,
+          price:null,
+          image:c.image_url||null,
+          verified:c.safelist_status==='verified',
+          source:'opensea',chain:'ETH',
+          mintDate:null,
+          hype:Math.min(92,50+Math.floor(Math.random()*35)),
+          tag:ageHours<72?'NEW':'UPCOMING',
+          status:'upcoming'
+        };
+      }).filter(Boolean).slice(0,12);
+    }
     STATE.collections=[...STATE.collections.filter(c=>c.source!=='opensea'&&!cols.find(x=>x.name.toLowerCase()===c.name.toLowerCase())),...cols.filter(c=>c.name)];
-    setApi('os','live','OpenSea: LIVE');
+    setApi('os','live','OpenSea Drops: LIVE');
     $('osSt').textContent='OPENSEA ✓';
     log('OpenSea: '+cols.length+' newest upcoming drops','ok');
     renderCols();
@@ -1403,6 +1449,56 @@ async function fetchOs(){
     $('osSt').textContent='OPENSEA ✗';$('osSt').classList.remove('on');
     log('OpenSea error — showing community picks','warn');
     loadFallback();
+  }
+}
+
+
+/* OPENSEA TRENDING COLLECTIONS — from opensea.io/collections */
+async function fetchTrending(){
+  try{
+    const key=STATE.osKey||await getOsKey();
+    const h={'Accept':'application/json','x-api-key':key};
+    // Trending = sorted by 1d volume descending, ETH chain
+    const r=await corsGet('https://api.opensea.io/api/v2/collections?chain=ethereum&order_by=one_day_volume&limit=20',{headers:h});
+    const d=await r.json();
+    if(!d.collections?.length) throw new Error('no data');
+
+    const cols=d.collections.map(c=>{
+      const name=c.name||'';
+      if(!name||name.length<3) return null;
+      if(name.match(/^0x[a-fA-F0-9]{6,}/)) return null;
+      if((c.collection||'').match(/^0x[a-fA-F0-9]{6,}/)) return null;
+      const handle=c.twitter_username?'@'+c.twitter_username:null;
+      const vol=c.one_day_volume||0;
+      const change=c.one_day_change||0;
+      const tag=change>0.5?'HOT':change>0.1?'TRENDING':'LIVE';
+      return{
+        name,slug:c.collection,handle,
+        supply:parseInt(c.total_supply)||0,
+        price:c.floor_price||null,
+        vol24:vol,
+        change,
+        image:c.image_url||null,
+        verified:c.safelist_status==='verified',
+        source:'trending',chain:'ETH',
+        mintDate:null,
+        hype:Math.min(98,70+Math.floor(change*10)),
+        tag,
+        status:'live'
+      };
+    }).filter(Boolean).slice(0,12);
+
+    // Merge — dedupe by name against existing
+    const existing=new Set(STATE.collections.map(c=>c.name.toLowerCase()));
+    const fresh=cols.filter(c=>!existing.has(c.name.toLowerCase()));
+    STATE.collections=[...STATE.collections.filter(c=>c.source!=='trending'),...fresh,...cols.filter(c=>existing.has(c.name.toLowerCase())&&c.source!=='trending'?false:c.source==='trending')];
+    // Simpler: just replace trending slice
+    STATE.collections=[...STATE.collections.filter(c=>c.source!=='trending'),...cols];
+    const td=$('trendDot'),tl=$('trendLbl');if(td){td.className='api-dot live';}if(tl){tl.textContent='Trending: LIVE';tl.className='api-lbl live';}
+    log('OpenSea Trending: '+cols.length+' collections','ok');
+    renderCols();
+  }catch(e){
+    log('OpenSea Trending error: '+e.message,'warn');
   }
 }
 
@@ -1584,7 +1680,7 @@ function renderCols(){
         <span class="cf">${c.name.charAt(0)}</span></div>
       <div class="cbody">
         <div class="cname">${c.name.slice(0,15)}${c.verified?'<span class="vmark">&#10003;</span>':''}${chainBadge}</div>
-        <div class="chandle" style="color:var(--accent);font-size:9.5px;">${(c.handle||'').slice(0,18)}</div>
+        ${c.handle?`<div class="chandle" style="color:var(--accent);font-size:9.5px;">${c.handle.slice(0,18)}</div>`:''}
         <div class="cstats">
           <div><span class="csl">Mint Price</span><span class="csv">${fmtP(c.price,chain,c.launched)}</span></div>
           <div><span class="csl">Supply</span><span class="csv">${c.supply?c.supply.toLocaleString():'—'}</span></div>
@@ -2247,7 +2343,7 @@ document.querySelectorAll('.nav-item').forEach(t=>t.addEventListener('click',()=
   $('leftPanel').style.display = showPanel ? '' : 'none';
 }));
 ['fSrc','fStat','fSort','fSrch'].forEach(id=>{$(id).addEventListener('change',renderCols);$(id).addEventListener('input',renderCols);});
-$('refBtn').addEventListener('click',()=>{log('Refreshing all sources...','info');fetchOs();fetchCg();fetchOrdinals();loadEth();loadGas();loadBtc();});
+$('refBtn').addEventListener('click',()=>{log('Refreshing all sources...','info');fetchOs();fetchTrending();fetchCg();fetchOrdinals();loadEth();loadGas();loadBtc();});
 
 function updateClock(){$('clk').textContent=new Date().toLocaleTimeString('en-US',{hour12:false});}
 function log(msg,type=''){
@@ -2265,7 +2361,7 @@ async function init(){
   renderTracked();renderTasks();renderSaved();
   restoreBurnerSession();
   log('Connecting to live data sources...','info');
-  await Promise.all([loadPrices(),loadGas(),getOsKey().then(()=>fetchOs()),fetchCg(),fetchOrdinals()]);
+  await Promise.all([loadPrices(),loadGas(),getOsKey().then(()=>Promise.all([fetchOs(),fetchTrending()])),fetchCg(),fetchOrdinals()]);
   setTimeout(()=>loadTwEmbeds(),600);
 }
 /* ═══════════════════════════════════════
