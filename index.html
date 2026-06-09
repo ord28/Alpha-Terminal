@@ -460,7 +460,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 
 /* COLLECTION CARDS */
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;}
-.ccard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .2s;position:relative;}
+.ccard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .2s;position:relative;cursor:pointer;}
 .ccard:hover{border-color:var(--border3);transform:translateY(-3px);box-shadow:0 12px 32px rgba(14,165,233,.1);}
 .cimg{width:100%;aspect-ratio:1;background:linear-gradient(135deg,#1e0938,#075985);display:grid;place-items:center;font-family:var(--font-d);font-weight:800;font-size:30px;color:rgba(255,255,255,.15);overflow:hidden;position:relative;border-bottom:1px solid var(--border);}
 .cimg img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
@@ -1212,7 +1212,7 @@ async function corsGet(url, opts={}) {
   throw lastErr||new Error('All CORS proxies failed for: '+url);
 }
 const CORS=u=>`https://corsproxy.io/?url=${encodeURIComponent(u)}`;
-const STATE={osKey:null,collections:[],tasks:[],saved:[],mode:'scheduled',chain:'ETH',ethPrice:0,btcPrice:0,gasPrice:0,tracked:['nftculture','OmistaBTC','The_sugargirl','thebeaksart','ordinalswallet']};
+const STATE={osKey:null,collections:[],tasks:[],saved:[],mode:'scheduled',chain:'ETH',ethPrice:0,btcPrice:0,gasPrice:0,tracked:['nftculture','OmistaBTC','The_sugargirl','ordinalswallet','ethereum']};
 
 // User-pinned collections (populated from wallet or manual entry — no hardcoded data)
 const MY_COLLECTIONS=[];
@@ -1573,12 +1573,18 @@ function renderCols(){
     const sv=STATE.saved.some(s=>s.name===c.name);
     const tc=c.status==='live'?'live-tag':c.tag==='HOT'||c.tag==='PUMPING'?'hot':c.tag==='FREE'||c.tag==='NEW'?'new':c.tag==='SOON'?'soon':'';
     const tagLabel=c.status==='live'?'LIVE NOW':c.tag||'UPCOMING';
-    return`<div class="ccard"><div class="ctag ${tc}">${tagLabel}</div>
+    // Build destination URLs
+    const xUrl = c.handle ? `https://x.com/${(c.handle||'').replace('@','')}` : null;
+    const osUrl = chain==='ETH' ? `https://opensea.io/collection/${encodeURIComponent(c.slug||c.name.toLowerCase().replace(/\s+/g,'-'))}` : null;
+    const sfUrl = `https://www.satflow.com/collection/${encodeURIComponent(c.slug||c.name.toLowerCase().replace(/\s+/g,'-'))}`;
+    const cardDest = chain==='BTC' ? sfUrl : (osUrl||xUrl||'#');
+    return`<div class="ccard" style="cursor:pointer;" onclick="if(!event.target.closest('[data-action],[href]'))window.open('${cardDest}','_blank')">
+      <div class="ctag ${tc}">${tagLabel}</div>
       <div class="cimg">${c.image?`<img src="${c.image}" alt="" onerror="this.style.display='none'"/>`:''}
         <span class="cf">${c.name.charAt(0)}</span></div>
       <div class="cbody">
         <div class="cname">${c.name.slice(0,15)}${c.verified?'<span class="vmark">&#10003;</span>':''}${chainBadge}</div>
-        <div class="chandle">${(c.handle||'').slice(0,18)}</div>
+        <div class="chandle" style="color:var(--accent);font-size:9.5px;">${(c.handle||'').slice(0,18)}</div>
         <div class="cstats">
           <div><span class="csl">Mint Price</span><span class="csv">${fmtP(c.price,chain,c.launched)}</span></div>
           <div><span class="csl">Supply</span><span class="csv">${c.supply?c.supply.toLocaleString():'—'}</span></div>
@@ -1588,12 +1594,13 @@ function renderCols(){
         <div class="cacts" style="flex-direction:column;gap:5px;">
           <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;" data-action="save" data-name="${c.name}">${sv?'&#9733; Saved':'&#9734; Save'}</button>
           <div style="display:flex;gap:5px;">
-          ${chain==='BTC'
-            ? c.launched===false
-              ? `<span class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;color:var(--yellow);border-color:rgba(245,200,66,.3);cursor:default;">&#9201; Coming Soon</span>`
-              : `<a class="btn btn-primary btn-sm" style="flex:1;justify-content:center;background:linear-gradient(135deg,#f97316,#c2410c);text-decoration:none;" href="https://www.satflow.com/collection/${encodeURIComponent(c.slug||c.name.toLowerCase().replace(/\s+/g,'-'))}" target="_blank" rel="noopener">Satflow &#8599;</a>
-                 <a class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;text-decoration:none;border-color:rgba(249,115,22,.3);color:var(--btc);" href="https://ord.net/collection/${encodeURIComponent(c.slug||c.name.toLowerCase().replace(/\s+/g,'-'))}" target="_blank" rel="noopener">Ord.net &#8599;</a>`
-            : `<button class="btn btn-primary btn-sm" style="flex:1;justify-content:center;" data-action="snipe" data-name="${c.name}">${c.status==='live'?'&#9889; Snipe Now':'Watch &rarr;'}</button>`
+          ${chain==='ETH'
+            ? `<a class="btn btn-primary btn-sm" style="flex:1;justify-content:center;text-decoration:none;" href="${osUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">OpenSea &#8599;</a>
+               ${xUrl?`<a class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;text-decoration:none;" href="${xUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">X &#8599;</a>`:''}`
+            : chain==='BTC' && c.launched!==false
+            ? `<a class="btn btn-primary btn-sm" style="flex:1;justify-content:center;text-decoration:none;background:var(--btc);color:#fff;" href="${sfUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Satflow &#8599;</a>
+               ${xUrl?`<a class="btn btn-ghost btn-sm" style="flex:1;justify-content:center;text-decoration:none;" href="${xUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">X &#8599;</a>`:''}`
+            : `${xUrl?`<a class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;text-decoration:none;" href="${xUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">X &#8599;</a>`:''}`
           }
           </div>
         </div>
@@ -1605,11 +1612,7 @@ function renderCols(){
     if(i>=0)STATE.saved.splice(i,1);else STATE.saved.push(c);
     renderCols();renderSaved();log(`${i>=0?'Removed':'Saved'} ${c.name}`,'info');
   }));
-  $('cGrid').querySelectorAll('[data-action="snipe"]').forEach(b=>b.addEventListener('click',()=>{
-    const c=STATE.collections.find(x=>x.name===b.dataset.name);
-    document.querySelector('[data-tab="bot"]').click();$('mPrc').value=c.price||0;$('cAddr').focus();
-    log(`Pre-filling for ${c.name}`,'info');
-  }));
+
 }
 
 function renderTracked(){
