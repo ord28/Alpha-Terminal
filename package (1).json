@@ -1,0 +1,13 @@
+{
+  "name": "metafrens-terminal",
+  "version": "1.0.0",
+  "description": "MetaBot — NFT mint terminal",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "config": "node scripts/write-config.mjs",
+    "dev": "node scripts/write-config.mjs && python3 -m http.server 8080",
+    "start:turbo": "TURBO_MODE_ENABLED=true npm run dev",
+    "lint": "node --check app.js && node --check mintEngine.js"
+  }
+}
