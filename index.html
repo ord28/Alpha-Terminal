@@ -25,7 +25,8 @@
   --glow:0 0 30px rgba(14,165,233,0.05);--glow-sm:0 0 14px rgba(14,165,233,0.2);
 }
 
-/* DAY/NIGHT TOGGLE */
+/* FAB — desktop default */
+#fabContainer{ bottom:22px; right:22px; }
 .theme-toggle{display:flex;align-items:center;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:3px;cursor:pointer;position:relative;overflow:hidden;flex-shrink:0;}
 .theme-toggle-track{display:flex;align-items:center;gap:2px;position:relative;z-index:1;}
 .theme-toggle-opt{display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:16px;font-size:10px;font-weight:700;font-family:var(--font-b);letter-spacing:.04em;color:var(--text3);transition:all .25s;user-select:none;white-space:nowrap;}
@@ -118,227 +119,166 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 @media(max-width:768px){
 
   /* ── App shell ── */
-  .app{
-    flex-direction:column;
-    height:100dvh; /* dynamic viewport height avoids browser chrome overlap */
-  }
+  .app{ flex-direction:column; height:100dvh; }
 
-  /* ── Sidebar → bottom nav bar ── */
+  /* ── Sidebar → bottom nav ── */
   .sidebar{
-    width:100%;
-    height:56px;
-    flex-direction:row;
-    justify-content:space-around;
-    align-items:center;
-    border-right:none;
-    border-top:1px solid var(--border);
-    order:3; /* push below content */
-    flex-shrink:0;
-    padding:0 4px;
+    width:100%; height:56px; flex-direction:row;
+    justify-content:space-around; align-items:center;
+    border-right:none; border-top:1px solid var(--border);
+    order:3; flex-shrink:0; padding:0 4px;
+    /* sit above iOS home indicator */
+    padding-bottom:env(safe-area-inset-bottom,0);
+    height:calc(56px + env(safe-area-inset-bottom,0));
   }
   .sidebar::after{ display:none; }
-  .logo{ display:none; } /* hide logo icon in bottom bar */
-
-  .nav{
-    flex-direction:row;
-    padding:0;
-    gap:0;
-    width:100%;
-    justify-content:space-around;
-  }
-  .nav-item{
-    width:auto;
-    flex:1;
-    padding:6px 2px;
-    gap:3px;
-  }
+  .logo{ display:none; }
+  .nav{ flex-direction:row; padding:0; gap:0; width:100%; justify-content:space-around; }
+  .nav-item{ width:auto; flex:1; padding:6px 2px; gap:3px; }
   .nav-item span{ font-size:8px; }
   .nav-icon{ width:26px; height:26px; }
 
   /* ── Main wrap ── */
-  .main-wrap{
-    flex:1;
-    min-height:0;
-    overflow:hidden;
-    order:2;
-  }
+  .main-wrap{ flex:1; min-height:0; overflow:hidden; order:2; }
 
-  /* ── Topbar: single compact row ── */
+  /* ── Topbar ── */
   .topbar{
-    flex-direction:row;
-    align-items:center;
-    padding:8px 12px;
-    gap:8px;
-    flex-wrap:nowrap;
-    flex-shrink:0;
+    flex-direction:row; align-items:center;
+    padding:7px 10px; gap:6px; flex-wrap:nowrap; flex-shrink:0;
   }
-  .topbar-left{
-    gap:7px;
-    flex-shrink:0;
-  }
+  .topbar-left{ gap:6px; flex-shrink:0; }
   .topbar-right{
-    display:flex;
-    flex-direction:row;
-    align-items:center;
-    gap:6px;
-    margin-left:auto;
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    overflow-y:hidden;
-    scrollbar-width:none;
-    -ms-overflow-style:none;
-    max-width:calc(100vw - 180px);
-    padding-bottom:2px;
+    display:flex; flex-direction:row; align-items:center;
+    gap:5px; margin-left:auto; flex-wrap:nowrap;
+    overflow-x:auto; overflow-y:hidden;
+    scrollbar-width:none; -ms-overflow-style:none;
+    max-width:calc(100vw - 160px);
   }
   .topbar-right::-webkit-scrollbar{ display:none; }
+  .topbar-prices{ display:flex; flex-wrap:nowrap; align-items:center; gap:4px; order:1; flex-shrink:0; }
+  #walletFab{ order:2; flex-shrink:0; white-space:nowrap; padding:5px 9px; font-size:10px; }
 
-  .topbar-prices{
-    display:flex;
-    flex-direction:row;
-    flex-wrap:nowrap;
-    align-items:center;
-    gap:5px;
-    order:1;
-    flex-shrink:0;
-  }
-  #walletFab{
-    order:2;
-    flex-shrink:0;
-    white-space:nowrap;
-    padding:5px 10px;
-    font-size:10.5px;
-  }
-
-  /* Compact price pills */
+  /* Price pills */
   .stat-pill{
-    flex-direction:row;
-    align-items:center;
-    gap:3px;
-    padding:3px 7px;
-    background:var(--surface2);
-    border-radius:20px;
-    border:1px solid var(--border);
-    flex-shrink:0;
-    white-space:nowrap;
+    flex-direction:row; align-items:center; gap:2px;
+    padding:3px 6px; background:var(--surface2);
+    border-radius:20px; border:1px solid var(--border);
+    flex-shrink:0; white-space:nowrap;
   }
-  .stat-pill .sl{
-    font-size:7.5px;
-    letter-spacing:.03em;
-    color:var(--text3);
-    text-transform:uppercase;
-  }
-  .stat-pill .sv{
-    font-size:11px;
-    font-weight:700;
-    color:var(--text);
-  }
+  .stat-pill .sl{ font-size:7px; letter-spacing:.02em; color:var(--text3); text-transform:uppercase; }
+  .stat-pill .sv{ font-size:10.5px; font-weight:700; color:var(--text); }
   .stat-pill .sv span{ display:none; }
   .stat-pill .sv .price-val{ display:inline; }
 
-  .page-label{ font-size:13px; }
+  .page-label{ font-size:12px; }
   .page-sublabel{ display:none; }
   .live-dot{ width:6px; height:6px; }
   #clk{ display:none; }
-
-  /* ── Left panel hidden on mobile ── */
   .left-panel{ display:none; }
 
-  /* ── Content area fills remaining height ── */
-  .content-area{
-    flex:1;
-    min-height:0;
-    overflow:hidden;
-  }
-  .right-panel{
-    flex:1;
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-  }
+  /* ── Content area ── */
+  .content-area{ flex:1; min-height:0; overflow:hidden; }
+  .right-panel{ flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 
   /* ── Pages ── */
-  .page{ padding:14px 12px; }
-  .page-title{ font-size:20px; }
-  .page-desc{ font-size:11.5px; }
+  .page{ padding:12px 10px; }
+  .page-title{ font-size:18px; }
+  .page-desc{ font-size:11px; margin-top:2px; }
+  .page-header{ margin-bottom:14px; }
 
-  /* ── Cards / grids ── */
-  .cgrid{ grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
+  /* ── API bar — scroll horizontally, don't wrap ── */
+  .api-bar{
+    display:flex; flex-wrap:nowrap; overflow-x:auto;
+    scrollbar-width:none; gap:10px;
+    padding:7px 10px; margin-bottom:12px; font-size:9.5px;
+  }
+  .api-bar::-webkit-scrollbar{ display:none; }
+  .api-i{ flex-shrink:0; }
+
+  /* ── Filter bar — stack into 2×2 grid ── */
+  .filter-bar{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    padding:10px;
+    margin-bottom:12px;
+  }
+  .fg{ display:flex; flex-direction:column; gap:3px; }
+  .fg label{ font-size:8px; }
+  .l-sel,.l-inp{
+    width:100%; font-size:11px; padding:6px 8px; min-width:0;
+  }
+  /* Search spans full width */
+  .filter-bar .fg:nth-child(4){ grid-column:1/-1; }
+  /* Refresh button spans full width */
+  #refBtn{ grid-column:1/-1; width:100%; justify-content:center; }
+
+  /* ── Section header ── */
+  .sec-hdr{ margin-bottom:10px; }
+  .sec-title{ font-size:11px; }
+
+  /* ── Collection cards ── */
+  .cgrid{ grid-template-columns:1fr 1fr; gap:8px; }
+  .ccard{ border-radius:10px; }
+  .cimg{ aspect-ratio:1; }
+  .cbody{ padding:8px; }
+  .cname{ font-size:11px; }
+  .chandle{ font-size:8.5px; }
+  .cstats{ grid-template-columns:1fr 1fr; gap:4px; margin-bottom:7px; }
+  .csl{ font-size:7px; }
+  .csv{ font-size:10px; }
+  .cacts{ gap:4px; }
+  .cacts .btn{ font-size:9px; padding:4px 7px; }
+
+  /* ── Bot page grid ── */
   .bot-layout{ grid-template-columns:1fr; }
-  .pipeline{ grid-template-columns:1fr 1fr; overflow-x:auto; }
+  #mbPageGrid{ grid-template-columns:1fr !important; }
+  #burnerStats{ grid-template-columns:1fr 1fr !important; }
+  #mdConfigFields{ grid-template-columns:1fr 1fr !important; }
+  #mdMeta{ grid-template-columns:1fr 1fr !important; }
+  .task-meta{ grid-template-columns:1fr 1fr !important; }
+  .mb-tc-meta{ grid-template-columns:1fr 1fr !important; }
+  .mb-bot-grid{ grid-template-columns:1fr; }
+  .mb-inspect-grid{ grid-template-columns:1fr; }
+
+  /* ── Collab ── */
+  .pipeline{ grid-template-columns:1fr; }
   .collab-stats{ grid-template-columns:1fr 1fr; }
   .collab-form-grid{ grid-template-columns:1fr 1fr; }
+  #pg-collabs .page-header{ flex-direction:column; gap:8px; }
+
+  /* ── Radar ── */
   .radar-grid{ grid-template-columns:1fr; }
+  #pg-radar .page-header{ flex-direction:column; gap:8px; }
 
-  /* ── Burner stats grid ── */
-  #burnerStats{ grid-template-columns:1fr 1fr !important; }
-
-  /* ── Mint Direct config fields ── */
-  #mdConfigFields{ grid-template-columns:1fr 1fr !important; }
-
-  /* ── Radar stats row ── */
-  .radar-grid > div:last-child > div:first-child + div{
-    grid-template-columns:1fr 1fr;
-  }
-
-  /* ── FAB (theme toggle) sits above bottom nav ── */
+  /* ── FAB above bottom nav ── */
   #fabContainer{
-    bottom:66px;
-    right:12px;
+    bottom:calc(64px + env(safe-area-inset-bottom,0) + 8px);
+    right:10px;
   }
 
-  /* ── Modal full-width on mobile ── */
-  .modal{
-    width:96%;
-    padding:20px 16px;
-    border-radius:12px;
-    max-height:90dvh;
-    overflow-y:auto;
-  }
-  .cdm-inner{
-    width:96%;
-    padding:20px 16px;
-    max-height:90dvh;
-  }
+  /* ── Modals ── */
+  .modal{ width:96%; padding:18px 14px; border-radius:12px; max-height:90dvh; overflow-y:auto; }
+  .cdm-inner{ width:96%; padding:18px 14px; max-height:90dvh; }
+  #onboardModal .modal{ width:100%; max-width:100%; border-radius:0; min-height:100dvh; max-height:none; padding:20px 16px; }
 
-  /* ── Onboarding modal full screen ── */
-  #onboardModal .modal{
-    padding:20px 16px;
-    width:100%;
-    max-width:100%;
-    border-radius:0;
-    min-height:100dvh;
-    overflow-y:auto;
-    max-height:none;
-  }
-
-  /* ── Task meta grid compress ── */
-  .task-meta{ grid-template-columns:repeat(2,1fr) !important; }
-
-  /* ── Page header flex on collab ── */
-  #pg-collabs .page-header{ flex-direction:column; gap:10px; }
-  #pg-collabs .page-header > div:last-child{ width:100%; justify-content:flex-start; }
-
-  /* ── Radar page header ── */
-  #pg-radar .page-header{ flex-direction:column; gap:10px; }
-  #pg-radar .page-header > div:last-child{ width:100%; }
-
-  /* ── Bot task section ── */
-  #botTaskSection{ gap:14px; }
-
-  /* ── Mint direct meta cards ── */
-  #mdMeta{ grid-template-columns:1fr 1fr !important; }
+  /* ── Misc ── */
+  #mbPageGrid{ grid-template-columns:1fr !important; }
+  .lf-2col{ grid-template-columns:1fr 1fr; }
+  .mb-result-stats{ grid-template-columns:1fr 1fr 1fr; }
 }
 
 /* ── SMALL PHONES ≤480px ── */
 @media(max-width:480px){
-  .page-label{ font-size:12px; letter-spacing:0; }
+  .page-label{ font-size:11px; letter-spacing:0; }
   #solPill{ display:none; }
   #gasPill{ display:none; }
-  #walletFab{ padding:4px 9px; font-size:10px; }
+  #walletFab{ padding:4px 8px; font-size:9.5px; }
   .nav-item span{ font-size:7px; }
   .nav-icon{ width:22px; height:22px; }
-  .page{ padding:10px 10px; }
-  .page-title{ font-size:17px; }
-  .cgrid{ grid-template-columns:1fr 1fr; }
+  .page{ padding:10px 8px; }
+  .page-title{ font-size:16px; }
+  .cgrid{ grid-template-columns:1fr 1fr; gap:6px; }
   .pipeline{ grid-template-columns:1fr; }
   .collab-stats{ grid-template-columns:1fr 1fr; }
   .collab-form-grid{ grid-template-columns:1fr; }
@@ -347,9 +287,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   #mdConfigFields{ grid-template-columns:1fr 1fr !important; }
   .task-meta{ grid-template-columns:1fr 1fr !important; }
   .lf-2col{ grid-template-columns:1fr; }
-  /* TX modal rows stack on tiny screens */
   .tx-row{ flex-direction:column; gap:2px; }
   .tx-v{ text-align:left; }
+  /* Filter bar single column on tiny screens */
+  .filter-bar{ grid-template-columns:1fr; }
+  #refBtn{ grid-column:1; }
+  .filter-bar .fg:nth-child(4){ grid-column:1; }
+  /* Cards single column on very small */
+  .cgrid{ grid-template-columns:1fr 1fr; }
+  .cacts .btn{ font-size:8.5px; padding:3px 6px; }
 }
 .page-label{font-family:var(--font-d);font-weight:800;font-size:16px;letter-spacing:-.02em;background:linear-gradient(90deg,#fff 0%,#38bdf8 40%,#fff 60%,#0ea5e9 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glow-sweep 3s linear infinite;filter:drop-shadow(0 0 8px rgba(14,165,233,.5));}
 @keyframes glow-sweep{0%{background-position:0% center}100%{background-position:200% center}}
@@ -3156,7 +3102,7 @@ init();
 </div>
 
 <!-- BOTTOM-RIGHT FAB -->
-<div id="fabContainer" style="position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;align-items:flex-end;gap:10px;z-index:150;">
+<div id="fabContainer" style="position:fixed;display:flex;flex-direction:column;align-items:flex-end;gap:10px;z-index:150;">
   <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle day/night mode">
     <div class="theme-toggle-track">
       <div class="theme-toggle-opt active" id="topt-night">🌙 NIGHT</div>
