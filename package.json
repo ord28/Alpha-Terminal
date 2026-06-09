@@ -1,7 +1,7 @@
 {
-  "name": "metafrens-terminal",
+  "name": "alpha-terminal",
   "version": "1.0.0",
-  "description": "MetaBot — NFT mint terminal",
+  "description": "Bot — NFT mint terminal",
   "private": true,
   "type": "module",
   "scripts": {
